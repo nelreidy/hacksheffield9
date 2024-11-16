@@ -26,6 +26,11 @@ class Character:
         self.has_super_strength = False
         self.time_since_effect = 0
 
+        # Achievements
+        self.healthy_food_streak = 0
+        self.avoided_unhealthy_time = 0
+        self.avoided_radioactive_time = 0
+
     def set_gui(self, gui):
         self.gui = gui
 
@@ -65,19 +70,27 @@ class Character:
         if food.type == 'healthy':
             if food.name == 'apple' and random.random() < 0.1:
               # poisoned apple
-              print(f"uh oh! the {food.name} was poisoned...")
+              print(f"uh oh! the apple was poisoned...")
               self._kill_character()
             else:
+              self.healthy_food_streak += 1
               self._healthy_effect()
         elif food.type == 'unhealthy':
+            self.healthy_food_streak = 0
+            self.avoided_unhealthy_time = 0
             self._unhealthy_effect()
         elif food.type == 'deadly':
+            self.healthy_food_streak = 0
             self._deadly_effect()
         elif food.type == 'radioactive':
+            self.healthy_food_streak = 0
+            self.avoided_radioactive_time = 0
             self._radioactive_effect()
         elif food.type == 'neutral':
+            self.healthy_food_streak = 0
             self._neutral_effect(food)
         else:
+            self.healthy_food_streak = 0
             print(f"{food.name} has an unknown effect on {self.name}.")
         
         self._check_hungry()
@@ -182,6 +195,10 @@ class Character:
         days = self.time_speed
         self.age += days / 365
         self.attributes["hunger"] -= days * 0.5
+
+        # Update achievements
+        self.avoided_radioactive_time += self.time_speed
+        self.avoided_unhealthy_time += self.time_speed
 
         if self.attributes["hunger"] <= 0.0:
             print(f"{self.name} starved to death!")
