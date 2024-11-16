@@ -229,4 +229,17 @@ class Character:
         years = int(self.age)
         months = round((self.age - years) * 12)
         return f"{years} years, {months} months"
-    
+  
+    #-----------------------------------------------------------
+    # OTHER METHODS
+
+    def go_on_date(self):
+        # Go on a date
+        print(f"{self.name} is going on a date!")
+        if random.random < 0.05:
+            # Very slim chance of meeting a serial killer
+            print(f"{self.name}'s date was a serial killer... oh dear.")
+            self._kill_character()
+        else:
+            print(f"{self.name} had a successful date!")
+            self.attributes["happiness"] += 20

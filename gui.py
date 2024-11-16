@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import random
 from character import Character
-from constants import REFRESH_RATE, MIN_TIME_SPEED, MAX_TIME_SPEED
+from constants import REFRESH_RATE, MIN_TIME_SPEED, MAX_TIME_SPEED, DATING_AGE
 from food import Food
 
 class GUI:
@@ -288,6 +288,10 @@ class GUI:
         exercise_button.grid(row=3, column=1, padx=5, pady=10)  
         self.all_buttons.append(exercise_button)
 
+        self.date_button = tk.Button(self.interaction_frame, text="Date", width=25, command=self.go_on_date, state=tk.DISABLED)
+        self.date_button.grid(row=3, column=2, padx=5, pady=10)  
+        self.all_buttons.append(self.date_button)
+
         # Start time loop
         self.update_time()
 
@@ -338,6 +342,16 @@ class GUI:
         self.stat_labels["Hunger"].config(text=f"{self.character.attributes['hunger']:.2f}")
         self.stat_labels["Hair Length"].config(text=f"{self.character.attributes['hair_length']:.2f} cm")
 
+    def check_dating_age(self):
+        # Check if character is old enough to date
+        if self.character.age >= DATING_AGE:
+            self.date_button.config(state=tk.ENABLED)
+        
+    def go_on_date(self):
+        # Go on a date
+        self.character.go_on_date()
+        self.update_stats()
+
     def update_time_speed(self, event):
         # Update time_speed based on slider value
         self.character.time_speed = self.time_slider.get()
@@ -345,11 +359,12 @@ class GUI:
     def update_time(self):
         # Simulate time passing
         # Method is called repeatedly
+        if self.character.dead:
+            return
+
         self.character.pass_time()
         self.update_stats()
-        if (not self.character.dead):
-            self.update_body_size()
-
+        self.update_body_size()
         self.check_achievements()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
