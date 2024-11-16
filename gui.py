@@ -26,7 +26,9 @@ class GUI:
     def cure(self):
         # Clear the head and redraw it with peachpuff fill
         self.character_canvas.delete("head")
+        self.character_canvas.delete("body")
         self.character_canvas.create_oval(100, 50, 200, 150, fill="peachpuff", tags="head")
+        self.character_canvas.create_rectangle(120, 150, 180, 300, fill="lightblue", tags="body")
         
         # reset head colour and number 
         self.character.head_colour = ""
@@ -55,6 +57,16 @@ class GUI:
         self.character_canvas.create_oval(152, height+6, 252, height + 106, fill="green", tags="head")
         self.character_canvas.create_oval(48, height, 148, height + 100, fill="green", tags="head")
 
+    # Function to make skin glow
+    def glowing_skin(self):
+        # Clear the body and redraw with gold fill
+        self.character_canvas.delete("body")
+        self.character_canvas.create_rectangle(120, 150, 180, 300, fill="gold", tags="body")
+    
+    def strong_arms(self):
+        self.character_canvas.delete("arm")
+        self.character_canvas.create_rectangle(30, 155, 120, 200, fill="peachpuff", tags="arm")
+        self.character_canvas.create_rectangle(180, 155, 270, 200, fill="peachpuff", tags="arm")
 
     def setup_ui(self):
         self.root.title("Simulation UI")
@@ -69,7 +81,9 @@ class GUI:
 
         # Draw the character (basic placeholder)
         self.character_canvas.create_oval(100, 50, 200, 150, fill="peachpuff", tags="head")  # Head
-        self.character_canvas.create_rectangle(120, 150, 180, 300, fill="lightblue")  # Body
+        self.character_canvas.create_rectangle(120, 150, 180, 300, fill="lightblue", tags="body")  # Body
+        self.character_canvas.create_rectangle(60, 155, 120, 180, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 155, 240, 180, fill="peachpuff", tags="arm") # Right arm
 
         # Stats Section
         self.stats_frame = tk.Frame(self.root, width=200, height=400)
