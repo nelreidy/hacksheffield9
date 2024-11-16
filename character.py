@@ -23,6 +23,8 @@ class Character:
         self.time_speed = 1 # How fast time passes
         self.head_colour = ""
         self.head_number = 1
+        self.has_super_strength = False
+        self.time_since_effect = 0
 
     def set_gui(self, gui):
         self.gui = gui
@@ -43,6 +45,11 @@ class Character:
         
         if self.time_speed < MIN_TIME_SPEED:
             self.time_speed = MIN_TIME_SPEED
+
+        if self.time_since_effect > 3:
+            self.gui.normal_arms()
+            self.has_super_strength = False
+            self.time_since_effect = 0
 
     #-----------------------------------------------------------
     # EATING EFFECTS
@@ -82,7 +89,7 @@ class Character:
     def _healthy_effect(self):
         print(f"{self.name} feels healthier, fitter, and grows a little!")
 
-        self.attributes["hunger"] += 20
+        self.attributes["hunger"] += 5
         self.attributes["health"] += 10
         self.attributes["fitness"] += 5
         self.attributes["height"] += 1

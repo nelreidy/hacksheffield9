@@ -63,10 +63,19 @@ class GUI:
         self.character_canvas.delete("body")
         self.character_canvas.create_rectangle(120, 150, 180, 300, fill="gold", tags="body")
     
+    # Bigger arms = stronger
     def strong_arms(self):
         self.character_canvas.delete("arm")
         self.character_canvas.create_rectangle(30, 155, 120, 200, fill="peachpuff", tags="arm")
         self.character_canvas.create_rectangle(180, 155, 270, 200, fill="peachpuff", tags="arm")
+        self.character.has_super_strength = True
+
+    # After some time, arms go back to normal (small)
+    def normal_arms(self):
+        self.character_canvas.delete("arm") 
+        self.character_canvas.create_rectangle(60, 155, 120, 180, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 155, 240, 180, fill="peachpuff", tags="arm") # Right arm
+
 
     def setup_ui(self):
         self.root.title("Simulation UI")
@@ -132,7 +141,7 @@ class GUI:
         tk.Label(self.interaction_frame, text="Food Interaction", font=("Arial", 14)).grid(row=0, column=0, columnspan=5)
 
         # Create list of foods
-        food_types = [Food("Apple", "healthy"),
+        food_types = [  Food("Apple", "healthy"),
                         Food("Burger", "unhealthy"),
                         Food("Cookie", "neutral"),
                         Food("Magic Cookie", "radioactive"),
@@ -178,5 +187,7 @@ class GUI:
         # Simulate time passing
         self.character.pass_time()
         self.update_stats()
+        if self.character.has_super_strength:
+            self.character.time_since_effect+=1
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
