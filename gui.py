@@ -58,7 +58,7 @@ class GUI:
         self.character_canvas.create_oval(head_left, head_top, head_right, head_bottom, fill="peachpuff", tags="head")
 
         # Reset head color and number to default (single head)
-        print("cure")
+        
         self.character.head_colour = "peachpuff"
         self.character.body_colour = "lightblue"
 
@@ -176,6 +176,13 @@ class GUI:
         self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
         self.character_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10)
 
+        self.log_frame = tk.Frame(self.root, width=600, height=100, bg="white" )
+        self.log_frame.grid(row=1, column=1, columnspan=2, padx=10, pady=10 )
+
+        self.log_text = tk.Text(self.log_frame, width=70, height=5, wrap=tk.WORD, bg="white")
+        self.log_text.pack(pady=5)
+
+
         self.character_canvas = tk.Canvas(self.character_frame, width=300, height=400, bg="white")
         self.character_canvas.pack()
 
@@ -275,6 +282,13 @@ class GUI:
         # Start time loop
         self.update_time()
 
+    def update_log(self, new_text):
+        self.log_text.config(state=tk.NORMAL)  # Enable editing
+        self.log_text.delete(1.0, tk.END)  # Clear the existing text
+        self.log_text.insert(tk.END, new_text)  # Insert the new text
+        self.log_text.config(state=tk.DISABLED)  # Disable editing again
+
+
     def create_food_buttons(self):
         # Clear existing buttons
         for button in self.food_buttons:
@@ -287,7 +301,7 @@ class GUI:
             row = 1
             col = i
             button = tk.Button(self.interaction_frame, text=food.name, width=25, command=lambda f=food: self.feed_character(f))
-            button.grid(row=1, column=i, padx=5, pady=5)
+            button.grid(row=2, column=i, padx=5, pady=5, sticky="n")
             self.food_buttons.append(button)
 
     def feed_character(self, food: Food):
@@ -398,7 +412,7 @@ class GUI:
         arm_length = (body_top - body_bottom)*0.2
         arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width scaling
 
-        strength_scale = 10
+        strength_scale = 15
 
         if (self.character.has_super_strength)  :
             arm_length = (body_top - body_bottom)*0.5
