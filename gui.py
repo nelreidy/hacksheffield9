@@ -174,7 +174,7 @@ class GUI:
 
 
     def setup_ui(self):
-        self.root.title("Simulation UI")
+        self.root.title("Grown your own Human")
         self.root.geometry("900x560")
 
         # Character Canvas
@@ -345,7 +345,7 @@ class GUI:
     def check_dating_age(self):
         # Check if character is old enough to date
         if self.character.age >= DATING_AGE:
-            self.date_button.config(state=tk.ENABLED)
+            self.date_button.config(state=tk.NORMAL)
         
     def go_on_date(self):
         # Go on a date
@@ -362,6 +362,7 @@ class GUI:
         if self.character.dead:
             return
 
+        self.check_dating_age()
         self.character.pass_time()
         self.update_stats()
         self.update_body_size()

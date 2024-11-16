@@ -144,8 +144,8 @@ class Character:
         # Apply a random radioactive effect
         random_effects = [
             ("height", random.randint(-5, 15)),
-            ("health", random.randint(-20, 20)),
-            ("happiness", random.randint(-10, 10)),
+            ("health", random.randint(-40, 20)),
+            ("happiness", random.randint(-30, 10)),
             ("hunger", random.randint(-20, 20))
         ]
         for attr, effect in random_effects:
@@ -200,9 +200,9 @@ class Character:
             print(f"{self.name} is feeling the effects of old age...")
 
     def pass_time(self):
-        # Pass 1 day, adjusted by time speed
+        # Pass 1 week, adjust fields on time speed
         days = self.time_speed
-        self.age += days / 365
+        self.age += (days / 365) * 7
         self.attributes["hunger"] -= days * 0.5
         self.attributes["hair_length"] += days * 0.5
 
@@ -236,7 +236,7 @@ class Character:
     def go_on_date(self):
         # Go on a date
         print(f"{self.name} is going on a date!")
-        if random.random < 0.05:
+        if random.random() < 0.05:
             # Very slim chance of meeting a serial killer
             print(f"{self.name}'s date was a serial killer... oh dear.")
             self._kill_character()
