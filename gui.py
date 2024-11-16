@@ -71,12 +71,24 @@ class GUI:
         self.head_bottom = head_bottom
 
         
-    # Function to make the character's head turn black (Dead)
+    # Function to replace the character with a coffin (Dead)
     def kill(self):
-        # Clear the head and redraw it with black fill
-        self.character_canvas.delete("head")
+        # Remove character
+        self.character_canvas.delete("all")
 
-        self.character_canvas.create_oval(100, 50, 200, 150, fill="black", tags="head")
+        # Draw coffin
+        coffin_x1, coffin_y1 = 100, 50
+        coffin_x2, coffin_y2 = 200, 300
+        self.character_canvas.create_rectangle(coffin_x1, coffin_y1, coffin_x2, coffin_y2, fill="saddle brown", tags="coffin")
+        self.character_canvas.create_polygon(
+            (coffin_x1, coffin_y1, coffin_x1 - 20, coffin_y1 + 50, coffin_x1, coffin_y2, coffin_x2, coffin_y2,
+            coffin_x2 + 20, coffin_y1 + 50, coffin_x2, coffin_y1), fill="saddle brown", tags="coffin"
+        )
+
+        rip_x = (coffin_x1 + coffin_x2) / 2
+        rip_y = coffin_y1 + 40
+        self.character_canvas.create_text(rip_x, rip_y, text="RIP", font=("Arial", 20, "bold"), fill="black")
+
 
     # Function to make the character grow a 2nd head
     def grow_second_head(self):
@@ -210,16 +222,31 @@ class GUI:
 
         # Bind slider to update character's time_speed
         self.time_slider.bind("<Motion>", self.update_time_speed)
+        
+        # Achievements Section
+        self.achievements_frame = tk.Frame(self.root, width=300, height=400)
+        self.achievements_frame.grid(row=0, column=2, padx=10, pady=10, rowspan=2, sticky="n")
+        tk.Label(self.achievements_frame, text="Achievements", font=("Arial", 14)).pack(anchor="w")
+        
+        self.achievements = {
+            "Keep alive for 1 year": False,
+            "Keep alive for 2 years": False,
+            "Keep alive for 5 years": False,
+            "Keep alive for 10 years": False,
+            "Feed 5 healthy foods in a row": False,
+            "Avoid unhealthy food for 1 year": False,
+            "Avoid radioactive food for 1 year": False,
+        }
 
-        # Scenarios Section
-        self.scenarios_frame = tk.Frame(self.root, width=300, height=200, bg="lightgray")
-        self.scenarios_frame.grid(row=0, column=2, padx=10, pady=10, sticky="n")
-        tk.Label(self.scenarios_frame, text="Scenarios", font=("Arial", 14)).pack(anchor="w")
+        self.achievement_labels = {}
+        for achievement, status in self.achievements.items():
+            label = tk.Label(self.achievements_frame, text=achievement, font=("Arial", 12), bg="lightgray")
+            label.pack(anchor="w", pady=5)
+            self.achievement_labels[achievement] = label
 
         # Interaction Section
         self.interaction_frame = tk.Frame(self.root, width=600, height=200, bg="white")
         self.interaction_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
-
         tk.Label(self.interaction_frame, text="Food Interaction", font=("Arial", 14)).grid(row=0, column=0, columnspan=5)
 
         # Create list of foods
@@ -232,7 +259,7 @@ class GUI:
                         Food("Blue Mushrooms", "radioactive"),
                         Food("Pink Mushrooms", "deadly"),
                         Food("Pizza", "unhealthy"),
-                        Food("Salad", "unhealthy"),
+                        Food("Salad", "healthy"),
                         Food("Spinach", "radioactive"),
                         Food("Ice Cream", "unhealthy"),
                         Food("Fruit Salad", "healthy"),
@@ -285,10 +312,14 @@ class GUI:
 
     def update_time(self):
         # Simulate time passing
+        # Method is called repeatedly
         self.character.pass_time()
         self.update_stats()
-        self.update_body_size()
+        if (not self.character.dead):
+            self.update_body_size()
 
+
+        self.check_achievements()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
         if random.random() < 0.1: # random chance of resetting available foods
@@ -296,9 +327,14 @@ class GUI:
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
 
+
  
     def update_body_size(self):
         # Update body on GUI based on height and weight
+
+        if (self.character.dead):
+            return
+        
         body_top = 150
         body_left = 120
         body_right = body_left + (self.character.attributes["weight"] * 4)
@@ -340,6 +376,7 @@ class GUI:
                 head_left, head_top, head_right+add, head_bottom, fill=self.character.head_colour, tags="head"
             )
         elif self.character.head_number == 2:
+            head_bottom += 20
             # Draw two heads
             spacing = 0.5  # Space between the two heads
             first_head_left = head_left - (head_width / 2)
@@ -358,14 +395,14 @@ class GUI:
             )
 
         arm_scale = self.character.attributes["weight"] * 0.3  # Scaling factor for arms based on weight
-        arm_length = (body_top - body_bottom)*0.15
+        arm_length = (body_top - body_bottom)*0.2
         arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width scaling
 
         strength_scale = 10
 
         if (self.character.has_super_strength)  :
             arm_length = (body_top - body_bottom)*0.5
-            strength_scale = 20
+            strength_scale = 25
             print("super")
 
         width_scale = body_right - body_left
@@ -375,3 +412,34 @@ class GUI:
         self.character_canvas.delete("arm2")
         self.character_canvas.create_rectangle(body_left - width_scale, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
         self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm2")  # R
+
+        
+
+    def update_achievement_status(self, achievement_name):
+        # Update achievement to completed
+        self.achievements[achievement_name] = True
+        self.achievement_labels[achievement_name].config(bg="gold")
+    
+    def check_achievements(self):
+        # Alive achievements
+        if self.character.age >= 1 and not self.achievements["Keep alive for 1 year"]:
+            self.update_achievement_status("Keep alive for 1 year")
+        if self.character.age >= 2 and not self.achievements["Keep alive for 2 years"]:
+            self.update_achievement_status("Keep alive for 2 years")
+        if self.character.age >= 5 and not self.achievements["Keep alive for 5 years"]:
+            self.update_achievement_status("Keep alive for 5 years")
+        if self.character.age >= 10 and not self.achievements["Keep alive for 10 years"]:
+            self.update_achievement_status("Keep alive for 10 years")
+        
+        # 5 healthy foods in a row
+        if self.character.healthy_food_streak >= 5 and not self.achievements["Feed 5 healthy foods in a row"]:
+            self.update_achievement_status("Feed 5 healthy foods in a row")
+
+        # Avoided unhealthy food for 1 year
+        if self.character.avoided_unhealthy_time >= 365 and not self.achievements["Avoid unhealthy food for 1 year"]:
+            self.update_achievement_status("Avoid unhealthy food for 1 year")
+
+        # Avoided radioactive food for 1 year
+        if self.character.avoided_radioactive_time >= 365 and not self.achievements["Avoid radioactive food for 1 year"]:
+            self.update_achievement_status("Avoid radioactive food for 1 year")
+
