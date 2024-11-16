@@ -10,6 +10,7 @@ def main():
     # Start the GUI
     root = tk.Tk()
     gui = GUI(root, character)
+    character.set_gui(gui)
     root.mainloop()
 
 if __name__ == "__main__":

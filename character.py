@@ -4,6 +4,7 @@ import random
 from constants import *
 from food import Food
 
+
 class Character:
     def __init__(self, name: str):
         self.name = name
@@ -20,6 +21,11 @@ class Character:
         }
         self.effects = []  # Stores special effects like "second head"
         self.time_speed = 1 # How fast time passes
+        self.head_colour = ""
+        self.head_number = 1
+
+    def set_gui(self, gui):
+        self.gui = gui
 
     def _check_attributes(self):
         # Ensure attributes don't go below zero or exceed reasonable limits
@@ -32,7 +38,7 @@ class Character:
         self.attributes["hunger"] = max(0, min(self.attributes["hunger"], MAX_HUNGER))
 
         if self.attributes["health"] == 0 and not self.dead:
-            self.dead = True
+            self._kill_character()
             print(f"{self.name} has died due to poor health!")
         
         if self.time_speed < MIN_TIME_SPEED:
@@ -73,6 +79,9 @@ class Character:
         self.attributes["height"] += 1
         self.attributes["hair_length"] += 2
         self.attributes["happiness"] += 5
+        
+        if random.random() < 0.35: # low chance of curing you if apple eaten
+            self.gui.cure()
 
     def _unhealthy_effect(self):
         print(f"{self.name} feels unfit but happier...")
@@ -81,6 +90,8 @@ class Character:
         self.attributes["health"] -= 10
         self.attributes["fitness"] -= 5
         self.attributes["happiness"] += 10
+        
+       # self.gui.fat()
 
     def _deadly_effect(self):
         print(f"{self.name} has eaten something deadly... uh oh!")
@@ -108,6 +119,16 @@ class Character:
 
             if strange_effect == "super strength":
                 self.attributes["fitness"] += 20
+            elif strange_effect == "green head":
+                if self.head_number == 2:
+                    self.gui.grow_second_green_head()
+                else:
+                    self.gui.turn_head_green()
+            elif strange_effect == "a second head":
+                if self.head_colour == "green":
+                    self.gui.grow_second_green_head()
+                else:
+                    self.gui.grow_second_head()
 
     def _neutral_effect(self, food: Food):
         print(f"{self.name} ate the {food.name}, but not much happened.")
@@ -119,6 +140,7 @@ class Character:
         # Kill the character
         self.attributes["health"] = 0
         self.dead = True
+        self.gui.kill()
 
     def _aging_effect(self):
         # Apply effects based on age of character

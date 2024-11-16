@@ -29,9 +29,10 @@ BASE_HUNGER = 30
 MAX_HUNGER = 100
 STARVING_LEVEL = 10
 
-RADIOACTIVE_EFFECTS = ["second head", 
+RADIOACTIVE_EFFECTS = ["a second head", 
                        "glowing skin", 
-                       "super strength"
+                       "super strength",
+                       "green head"
                        ]
 
 # How often pass_time() is called

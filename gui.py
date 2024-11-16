@@ -20,18 +20,41 @@ class GUI:
         # Clear the head and redraw it with green fill
         self.character_canvas.delete("head")
         self.character_canvas.create_oval(100, 50, 200, 150, fill="green", tags="head")
+        self.character.head_colour = "green"
 
-    # Function to make the character's head turn normal (Alive/neutral)
+    # Function to make the character's head turn normal (Alive/neutral/cured)
     def cure(self):
         # Clear the head and redraw it with peachpuff fill
         self.character_canvas.delete("head")
         self.character_canvas.create_oval(100, 50, 200, 150, fill="peachpuff", tags="head")
+        
+        # reset head colour and number 
+        self.character.head_colour = ""
+        self.character.head_number = 1
         
     # Function to make the character's head turn black (Dead)
     def kill(self):
         # Clear the head and redraw it with black fill
         self.character_canvas.delete("head")
         self.character_canvas.create_oval(100, 50, 200, 150, fill="black", tags="head")
+
+    # Function to make the character grow a 2nd head
+    def grow_second_head(self):
+        # Clear the head and redraw 2 
+        self.character_canvas.delete("head")
+        height = 55
+        self.character_canvas.create_oval(152, height+6, 252, height + 106, fill="peachpuff", tags="head")
+        self.character_canvas.create_oval(48, height, 148, height + 100, fill="peachpuff", tags="head")
+        self.character.head_number = 2
+
+    # Function to make the character grow a 2nd green head
+    def grow_second_green_head(self):
+        # Clear the head and redraw 2 with green fill
+        self.character_canvas.delete("head")
+        height = 55
+        self.character_canvas.create_oval(152, height+6, 252, height + 106, fill="green", tags="head")
+        self.character_canvas.create_oval(48, height, 148, height + 100, fill="green", tags="head")
+
 
     def setup_ui(self):
         self.root.title("Simulation UI")
@@ -106,9 +129,10 @@ class GUI:
 
         # Create food buttons
         for i, food in enumerate(food_types):
-            row = 1 if i < 5 else 2  # First 5 buttons in row 1, next 5 in row 2
-            col = i % 5  # Column resets after 5 buttons
-            button = tk.Button(self.interaction_frame, text=food_types[i].name, width=10, command=lambda f=food: self.feed_character(f))
+            row = 1 if i < 4 else 2  # First 4 buttons in row 1, next 4 in row 2
+            col = i % 4  # Column resets after 4 buttons
+            button = tk.Button(self.interaction_frame, text=food_types[i].name, width=25, command=lambda f=food: self.feed_character(f))
+
             button.grid(row=row, column=col, padx=5, pady=5)
             self.food_buttons.append(button)
         
@@ -138,4 +162,5 @@ class GUI:
         # Simulate time passing
         self.character.pass_time()
         self.update_stats()
-        self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
+        if not self.character.dead:
+            self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
