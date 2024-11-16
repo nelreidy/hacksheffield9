@@ -204,6 +204,7 @@ class Character:
         days = self.time_speed
         self.age += days / 365
         self.attributes["hunger"] -= days * 0.5
+        self.attributes["hair_length"] += days * 0.5
 
         # Update achievements
         self.avoided_radioactive_time += self.time_speed

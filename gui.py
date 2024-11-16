@@ -1,3 +1,4 @@
+import _tkinter
 import tkinter as tk
 from tkinter import ttk
 import random
@@ -12,6 +13,7 @@ class GUI:
         self.character_canvas = None
         self.stat_labels = {}
         self.food_buttons = []
+        self.all_buttons = []
 
         self.head_left = 0 
         self.head_right = 0 
@@ -20,9 +22,6 @@ class GUI:
         self.head_width = 0
         self.head_height = 0
         self.arm_height = 15
-
-        
-
 
         self.setup_ui()
         self.update_stats()
@@ -69,7 +68,6 @@ class GUI:
         self.head_right = head_right
         self.head_top = head_top
         self.head_bottom = head_bottom
-
         
     # Function to replace the character with a coffin (Dead)
     def kill(self):
@@ -89,6 +87,13 @@ class GUI:
         rip_y = coffin_y1 + 40
         self.character_canvas.create_text(rip_x, rip_y, text="RIP", font=("Arial", 20, "bold"), fill="black")
 
+        # Disable buttons
+        for button in self.all_buttons:
+            try:
+                button.config(state=tk.DISABLED)
+            except _tkinter.TclError:
+                # Button may have already been destroyed
+                pass
 
     # Function to make the character grow a 2nd head
     def grow_second_head(self):
@@ -170,7 +175,7 @@ class GUI:
 
     def setup_ui(self):
         self.root.title("Simulation UI")
-        self.root.geometry("1000x510")
+        self.root.geometry("900x560")
 
         # Character Canvas
         self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
@@ -219,10 +224,11 @@ class GUI:
         self.time_slider = ttk.Scale(self.time_frame, from_=MIN_TIME_SPEED, to=MAX_TIME_SPEED, orient="horizontal", length=150)
         self.time_slider.set(1)  # Default speed
         self.time_slider.pack(side="left")
+        self.all_buttons.append(self.time_slider)
 
         # Bind slider to update character's time_speed
         self.time_slider.bind("<Motion>", self.update_time_speed)
-        
+
         # Achievements Section
         self.achievements_frame = tk.Frame(self.root, width=300, height=400)
         self.achievements_frame.grid(row=0, column=2, padx=10, pady=10, rowspan=2, sticky="n")
@@ -236,6 +242,7 @@ class GUI:
             "Feed 5 healthy foods in a row": False,
             "Avoid unhealthy food for 1 year": False,
             "Avoid radioactive food for 1 year": False,
+            "Rapunzel": False,
         }
 
         self.achievement_labels = {}
@@ -247,7 +254,7 @@ class GUI:
         # Interaction Section
         self.interaction_frame = tk.Frame(self.root, width=600, height=200, bg="white")
         self.interaction_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
-        tk.Label(self.interaction_frame, text="Food Interaction", font=("Arial", 14)).grid(row=0, column=0, columnspan=5)
+        tk.Label(self.interaction_frame, text="Interaction", font=("Arial", 14)).grid(row=0, column=0, columnspan=5)
 
         # Create list of foods
         self.food_types = [  Food("Apple", "healthy"),
@@ -271,13 +278,23 @@ class GUI:
 
         # Create food buttons
         self.create_food_buttons()
-        
+
+        # Create action buttons
+        cut_hair_button = tk.Button(self.interaction_frame, text="Cut Hair", width=25, command=self.cut_hair)
+        cut_hair_button.grid(row=3, column=0, padx=5, pady=10)
+        self.all_buttons.append(cut_hair_button)
+
+        exercise_button = tk.Button(self.interaction_frame, text="Exercise", width=25, command=self.exercise)
+        exercise_button.grid(row=3, column=1, padx=5, pady=10)  
+        self.all_buttons.append(exercise_button)
+
         # Start time loop
         self.update_time()
 
     def create_food_buttons(self):
         # Clear existing buttons
-        for button in self.food_buttons:
+        for i, button in enumerate(self.food_buttons):
+            self.all_buttons.pop(i)
             button.destroy()
         self.food_buttons.clear()
 
@@ -289,22 +306,37 @@ class GUI:
             button = tk.Button(self.interaction_frame, text=food.name, width=25, command=lambda f=food: self.feed_character(f))
             button.grid(row=1, column=i, padx=5, pady=5)
             self.food_buttons.append(button)
+            self.all_buttons.append(button)
 
     def feed_character(self, food: Food):
         # Feed character and update stats
         self.character.eat(food)
         self.update_stats()
+        self.check_achievements()
     
+    def cut_hair(self):
+        # Cut hair and update stats
+        new_len = max(0, self.character.attributes['hair_length'] - 10)
+        self.character.attributes['hair_length'] = new_len
+        self.update_stats()
+
+    def exercise(self):
+        # Exercise and update stats
+        self.character.attributes['hunger'] -= random.randint(5, 8)
+        self.character.attributes['fitness'] += random.randint(5, 8)
+        self.character.attributes['health'] += random.randint(3, 5)
+        self.character.attributes['happiness'] += random.randint(3, 5)
+
     def update_stats(self):
         # Update stats on the GUI
         self.stat_labels["Age"].config(text=f"{self.character.get_age_string()}")
-        self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']} kg")
-        self.stat_labels["Height"].config(text=f"{self.character.attributes['height']} cm")
+        self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']:.2f} kg")
+        self.stat_labels["Height"].config(text=f"{self.character.attributes['height']:.2f} cm")
         self.stat_labels["Health"].config(text=f"{self.character.attributes['health']}")
         self.stat_labels["Fitness"].config(text=f"{self.character.attributes['fitness']}")
         self.stat_labels["Happiness"].config(text=f"{self.character.attributes['happiness']}")
-        self.stat_labels["Hunger"].config(text=f"{self.character.attributes['hunger']}")
-        self.stat_labels["Hair Length"].config(text=f"{self.character.attributes['hair_length']} cm")
+        self.stat_labels["Hunger"].config(text=f"{self.character.attributes['hunger']:.2f}")
+        self.stat_labels["Hair Length"].config(text=f"{self.character.attributes['hair_length']:.2f} cm")
 
     def update_time_speed(self, event):
         # Update time_speed based on slider value
@@ -318,7 +350,6 @@ class GUI:
         if (not self.character.dead):
             self.update_body_size()
 
-
         self.check_achievements()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
@@ -327,11 +358,8 @@ class GUI:
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
 
-
- 
     def update_body_size(self):
         # Update body on GUI based on height and weight
-
         if (self.character.dead):
             return
         
@@ -353,9 +381,6 @@ class GUI:
         head_right = head_center_x + (head_width / 10)
         head_bottom = body_top
 
-    
-
-
         self.head_right = head_right
         self.head_left = head_left
         self.head_top = head_top
@@ -364,7 +389,6 @@ class GUI:
         self.head_height = head_height
 
         add = 7 + (body_right - body_left)*0.3
-
 
         # Clear existing heads
         self.character_canvas.delete("head")
@@ -413,8 +437,6 @@ class GUI:
         self.character_canvas.create_rectangle(body_left - width_scale, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
         self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm2")  # R
 
-        
-
     def update_achievement_status(self, achievement_name):
         # Update achievement to completed
         self.achievements[achievement_name] = True
@@ -442,4 +464,7 @@ class GUI:
         # Avoided radioactive food for 1 year
         if self.character.avoided_radioactive_time >= 365 and not self.achievements["Avoid radioactive food for 1 year"]:
             self.update_achievement_status("Avoid radioactive food for 1 year")
-
+        
+        # Rapunzel (long hair)
+        if self.character.attributes["hair_length"] >= 500 and not self.achievements["Rapunzel"]:
+            self.update_achievement_status("Rapunzel")
