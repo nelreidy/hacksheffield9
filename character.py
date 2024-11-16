@@ -26,7 +26,7 @@ class Character:
         self.attributes["health"] = max(0, min(self.attributes["health"], MAX_HEALTH))
         self.attributes["fitness"] = max(0, min(self.attributes["fitness"], MAX_FITNESS))
         self.attributes["happiness"] = max(0, min(self.attributes["happiness"], MAX_HAPPINESS))
-        self.attributes["height"] = max(BASE_HEIGHT, self.attributes["height"], MAX_HEIGHT)
+        self.attributes["height"] = max(BASE_HEIGHT, min(self.attributes["height"], MAX_HEIGHT))
         self.attributes["weight"] = max(0, self.attributes["weight"])
         self.attributes["hair_length"] = max(0, self.attributes["hair_length"])
         self.attributes["hunger"] = max(0, min(self.attributes["hunger"], MAX_HUNGER))
@@ -62,7 +62,16 @@ class Character:
         else:
             print(f"{food.name} has an unknown effect on {self.name}.")
         
+        self._check_hungry()
         self._check_attributes()
+
+    def _check_hungry(self):
+        if self.attributes["hunger"] >= MAX_HUNGER:
+            print(f"{self.name} isn't hungry, the extra food made them feel ill!")
+            # TODO make this depend on how much extra they ate?
+            self.attributes["health"] -= 20
+            self.attributes["fitness"] -= 5
+            self.attributes["happiness"] -= 5
 
     def _healthy_effect(self):
         print(f"{self.name} feels healthier, fitter, and grows a little!")
@@ -142,5 +151,9 @@ class Character:
             self.attributes["health"] -= 5
             print(f"{self.name} is starving!")
         
+        if self.attributes["height"] < MAX_HEIGHT:
+            self.attributes["height"] += 0.25
+            self.attributes["weight"] += 0.1
+
         self._aging_effect()
         self._check_attributes()
