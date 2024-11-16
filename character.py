@@ -61,10 +61,15 @@ class Character:
             print(f"{self.name} is dead!")
             return
 
-        print(f"{self.name} is eating {food.name} ({food.type})")
+        print(f"{self.name} is eating {food.name}")
 
         if food.type == 'healthy':
-            self._healthy_effect()
+            if food.name == 'apple' and random.random() < 0.1:
+              # poisoned apple
+              print(f"uh oh! the {food.name} was poisoned...")
+              self._kill_character()
+            else:
+              self._healthy_effect()
         elif food.type == 'unhealthy':
             self._unhealthy_effect()
         elif food.type == 'deadly':
