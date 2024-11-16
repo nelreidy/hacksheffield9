@@ -184,3 +184,10 @@ class Character:
 
         self._aging_effect()
         self._check_attributes()
+
+    def get_age_string(self):
+        # Return a string of the age in year + months
+        years = int(self.age)
+        months = round((self.age - years) * 12)
+        return f"{years} years, {months} months"
+    

@@ -70,7 +70,7 @@ class GUI:
 
     def setup_ui(self):
         self.root.title("Simulation UI")
-        self.root.geometry("800x600")
+        self.root.geometry("1000x600")
 
         # Character Canvas
         self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
@@ -92,6 +92,7 @@ class GUI:
         tk.Label(self.stats_frame, text=f"{self.character.name}'s Stats", font=("Arial", 14)).pack()
 
         stats = {
+            "Age": "XX years XX months",
             "Weight": "XX kg",
             "Height": "XXX cm",
             "Health": "XX",
@@ -121,7 +122,7 @@ class GUI:
 
         # Scenarios Section
         self.scenarios_frame = tk.Frame(self.root, width=300, height=200, bg="lightgray")
-        self.scenarios_frame.grid(row=1, column=1, padx=10, pady=10, sticky="n")
+        self.scenarios_frame.grid(row=0, column=2, padx=10, pady=10, sticky="n")
         tk.Label(self.scenarios_frame, text="Scenarios", font=("Arial", 14)).pack(anchor="w")
 
         # Interaction Section
@@ -160,6 +161,7 @@ class GUI:
     
     def update_stats(self):
         # Update stats on the GUI
+        self.stat_labels["Age"].config(text=f"{self.character.get_age_string()}")
         self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']} kg")
         self.stat_labels["Height"].config(text=f"{self.character.attributes['height']} cm")
         self.stat_labels["Health"].config(text=f"{self.character.attributes['health']}")
