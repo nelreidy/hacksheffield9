@@ -19,7 +19,10 @@ class GUI:
         self.head_bottom = 0 
         self.head_width = 0
         self.head_height = 0
-        self.head_color = "peachpuff"
+        self.arm_height = 15
+
+        
+
 
         self.setup_ui()
         self.update_stats()
@@ -124,16 +127,33 @@ class GUI:
     
     # Bigger arms = stronger
     def strong_arms(self):
+        # Delete existing arms
         self.character_canvas.delete("arm")
-        self.character_canvas.create_rectangle(30, 155, 120, 200, fill="peachpuff", tags="arm")
-        self.character_canvas.create_rectangle(180, 155, 270, 200, fill="peachpuff", tags="arm")
+
+        # Scaling factor for arms based on character's size (weight and height)
+        arm_scale = self.character.attributes["weight"] * 0.3  # You can adjust this multiplier for better scaling
+        arm_length = 45 + arm_scale  # Length of the arms will increase with the character's size
+        arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width also scales with height
+
+        # Adjust arm positions based on the scaling
+        self.character_canvas.create_rectangle(30, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 155, 270, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
+
         self.character.has_super_strength = True
 
-    # After some time, arms go back to normal (small)
+
     def normal_arms(self):
-        self.character_canvas.delete("arm") 
-        self.character_canvas.create_rectangle(60, 155, 120, 180, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 240, 180, fill="peachpuff", tags="arm") # Right arm
+        # Delete existing arms
+        self.character_canvas.delete("arm")
+
+        # Scaling factor for arms based on character's size (weight and height)
+        arm_scale = self.character.attributes["weight"] * 0.2  # Adjust scaling based on weight
+        arm_length = 30 + arm_scale  # Default arm length, with a scaling factor
+        arm_width = 15 + (self.character.attributes["height"] * 0.03)  # Arm width based on height
+
+        # Adjust arm positions based on the scaling
+        self.character_canvas.create_rectangle(60, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 155, 240, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
 
 
     def setup_ui(self):
@@ -150,9 +170,11 @@ class GUI:
         # Draw the character (basic placeholder)
         self.character_canvas.create_oval(100, 80, 150, 150, fill="peachpuff", tags="head")  # Head
         self.character_canvas.create_rectangle(120, 150, 180, 300, fill="lightblue", tags="body")  # Body
-        self.character_canvas.create_rectangle(60, 155, 120, 180, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 240, 180, fill="peachpuff", tags="arm") # Right arm
-
+        self.character_canvas.create_rectangle(100, 155, 120, 160, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(130, 155, 150, 160, fill="peachpuff", tags="arm") # Right arm
+        
+        self.arm_height = 15
+        
 
         # Stats Section
         self.stats_frame = tk.Frame(self.root, width=200, height=400)
@@ -295,9 +317,8 @@ class GUI:
         head_right = head_center_x + (head_width / 10)
         head_bottom = body_top
 
-        
+    
 
-        print(body_left - body_right)
 
         self.head_right = head_right
         self.head_left = head_left
@@ -335,3 +356,22 @@ class GUI:
             self.character_canvas.create_oval(
                 second_head_left, head_top, second_head_right, head_bottom, fill=self.character.head_colour, tags="head2"
             )
+
+        arm_scale = self.character.attributes["weight"] * 0.3  # Scaling factor for arms based on weight
+        arm_length = (body_top - body_bottom)*0.15
+        arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width scaling
+
+        strength_scale = 10
+
+        if (self.character.has_super_strength)  :
+            arm_length = (body_top - body_bottom)*0.5
+            strength_scale = 20
+            print("super")
+
+        width_scale = body_right - body_left
+
+        # Draw arms based on scaled values
+        self.character_canvas.delete("arm")
+        self.character_canvas.delete("arm2")
+        self.character_canvas.create_rectangle(body_left - width_scale, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm2")  # R

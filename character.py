@@ -48,7 +48,6 @@ class Character:
             self.time_speed = MIN_TIME_SPEED
 
         if self.time_since_effect > 3:
-            self.gui.normal_arms()
             self.has_super_strength = False
             self.time_since_effect = 0
 
@@ -115,6 +114,7 @@ class Character:
 
     def _unhealthy_effect(self):
         print(f"{self.name} feels unfit but happier...")
+        self.has_super_strength = True
 
         self.attributes["hunger"] += 10
         self.attributes["health"] -= 10
@@ -147,7 +147,7 @@ class Character:
 
             if strange_effect == "super strength":
                 self.attributes["fitness"] += 20
-                self.gui.strong_arms()
+                self.has_super_strength = True
             elif strange_effect == "green head":
                 if self.head_number == 2:
                     self.gui.grow_second_green_head()
