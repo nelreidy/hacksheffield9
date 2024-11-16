@@ -89,7 +89,7 @@ class GUI:
         self.stats_frame = tk.Frame(self.root, width=200, height=400)
         self.stats_frame.grid(row=0, column=1, padx=10, pady=10, sticky="n")
 
-        tk.Label(self.stats_frame, text="Stats", font=("Arial", 14)).pack()
+        tk.Label(self.stats_frame, text=f"{self.character.name}'s Stats", font=("Arial", 14)).pack()
 
         stats = {
             "Weight": "XX kg",
