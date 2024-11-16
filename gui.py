@@ -35,11 +35,23 @@ class GUI:
         self.character.head_colour = ""
         self.character.head_number = 1
         
-    # Function to make the character's head turn black (Dead)
+    # Function to replace the character with a coffin (Dead)
     def kill(self):
-        # Clear the head and redraw it with black fill
-        self.character_canvas.delete("head")
-        self.character_canvas.create_oval(100, 50, 200, 150, fill="black", tags="head")
+        # Remove character
+        self.character_canvas.delete("all")
+
+        # Draw coffin
+        coffin_x1, coffin_y1 = 100, 50
+        coffin_x2, coffin_y2 = 200, 300
+        self.character_canvas.create_rectangle(coffin_x1, coffin_y1, coffin_x2, coffin_y2, fill="saddle brown", tags="coffin")
+        self.character_canvas.create_polygon(
+            (coffin_x1, coffin_y1, coffin_x1 - 20, coffin_y1 + 50, coffin_x1, coffin_y2, coffin_x2, coffin_y2,
+            coffin_x2 + 20, coffin_y1 + 50, coffin_x2, coffin_y1), fill="saddle brown", tags="coffin"
+        )
+
+        rip_x = (coffin_x1 + coffin_x2) / 2
+        rip_y = coffin_y1 + 40
+        self.character_canvas.create_text(rip_x, rip_y, text="RIP", font=("Arial", 20, "bold"), fill="black")
 
     # Function to make the character grow a 2nd head
     def grow_second_head(self):
