@@ -12,6 +12,14 @@ class GUI:
         self.stat_labels = {}
         self.food_buttons = []
 
+        self.head_left = 0 
+        self.head_right = 0 
+        self.head_top = 0 
+        self.head_bottom = 0 
+        self.head_width = 0
+        self.head_height = 0
+        self.head_color = "peachpuff"
+
         self.setup_ui()
         self.update_stats()
 
@@ -19,41 +27,93 @@ class GUI:
     def turn_head_green(self):
         # Clear the head and redraw it with green fill
         self.character_canvas.delete("head")
-        self.character_canvas.create_oval(100, 50, 200, 150, fill="green", tags="head")
+        self.character_canvas.create_oval(50, 50, 50, 50, fill="green", tags="head")
         self.character.head_colour = "green"
 
     # Function to make the character's head turn normal (Alive/neutral/cured)
     def cure(self):
         # Clear the head and redraw it with peachpuff fill
         self.character_canvas.delete("head")
-        self.character_canvas.create_oval(100, 50, 200, 150, fill="peachpuff", tags="head")
-        
-        # reset head colour and number 
-        self.character.head_colour = ""
+
+        # Use the head width and height attributes to determine the size of the head
+        head_width = self.head_right - self.head_left
+        head_height = self.head_bottom - self.head_top
+
+        # Calculate the center of the body and position the head accordingly
+        body_left = 120  # Assuming body_left is the starting point of the body
+        body_right = body_left + (self.character.attributes["weight"] * 4)
+        body_top = 150
+        body_bottom = body_top + (self.character.attributes["height"] * 2)
+
+        # Calculate the center for the head
+        head_center_x = (body_left + body_right) / 2
+        head_top = body_top - head_height
+        head_left = head_center_x - (head_width / 2)
+        head_right = head_center_x + (head_width / 1) 
+        head_bottom = head_top + head_height
+
+        # Redraw the head centered at the correct position
+        self.character_canvas.create_oval(head_left, head_top, head_right, head_bottom, fill="peachpuff", tags="head")
+
+        # Reset head color and number to default (single head)
+        self.character.head_colour = "peachpuff"
         self.character.head_number = 1
+
+        # Update the head position attributes for future use
+        self.head_left = head_left
+        self.head_right = head_right
+        self.head_top = head_top
+        self.head_bottom = head_bottom
+
         
     # Function to make the character's head turn black (Dead)
     def kill(self):
         # Clear the head and redraw it with black fill
         self.character_canvas.delete("head")
+
         self.character_canvas.create_oval(100, 50, 200, 150, fill="black", tags="head")
 
     # Function to make the character grow a 2nd head
     def grow_second_head(self):
-        # Clear the head and redraw 2 
+        # Clear existing heads
         self.character_canvas.delete("head")
-        height = 55
-        self.character_canvas.create_oval(152, height+6, 252, height + 106, fill="peachpuff", tags="head")
-        self.character_canvas.create_oval(48, height, 148, height + 100, fill="peachpuff", tags="head")
+
+        # Dimensions for the first head (left side)
+        first_head_left = self.head_left
+        first_head_right = self.head_right
+        first_head_top = self.head_top
+        first_head_bottom = self.head_bottom
+
+        # Dimensions for the second head (placed to the right of the first head)
+        head_width = first_head_right - first_head_left
+        second_head_left = first_head_right + 10  # Add spacing of 10 pixels
+        second_head_right = second_head_left + head_width
+        second_head_top = first_head_top
+        second_head_bottom = first_head_bottom
+
+        # Draw the first head
+        self.character_canvas.create_oval(
+            self.head_left - self.head_width/2, self.head_top,  self.head_right-self.head_width/2, self.head_bottom,
+            fill="green", tags="head"
+        )
+
+        self.head_left = self.head_left - self.head_width
+        self.head_right = self.head_right - self.head_width
+
+        self.character_canvas.create_oval(
+            self.head_left+self.head_width/2, self.head_top,  self.head_right+self.head_width/2, self.head_bottom,
+            fill="peachpuff", tags="head2"
+        )
+
+        # Update the character's head count
         self.character.head_number = 2
 
     # Function to make the character grow a 2nd green head
     def grow_second_green_head(self):
         # Clear the head and redraw 2 with green fill
-        self.character_canvas.delete("head")
-        height = 55
-        self.character_canvas.create_oval(152, height+6, 252, height + 106, fill="green", tags="head")
-        self.character_canvas.create_oval(48, height, 148, height + 100, fill="green", tags="head")
+        self.head_color = "green"
+        self.grow_second_head()
+
 
 
     def setup_ui(self):
@@ -68,8 +128,8 @@ class GUI:
         self.character_canvas.pack()
 
         # Draw the character (basic placeholder)
-        self.character_canvas.create_oval(100, 50, 200, 150, fill="peachpuff", tags="head")  # Head
-        self.character_canvas.create_rectangle(120, 150, 180, 300, fill="lightblue")  # Body
+        self.character_canvas.create_oval(100, 80, 150, 150, fill="peachpuff", tags="head")  # Head
+        self.character_canvas.create_rectangle(120, 150, 180, 300, fill="lightblue", tags="body")  # Body
 
         # Stats Section
         self.stats_frame = tk.Frame(self.root, width=200, height=400)
@@ -162,5 +222,61 @@ class GUI:
         # Simulate time passing
         self.character.pass_time()
         self.update_stats()
+        self.update_body_size()
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
+
+ 
+    def update_body_size(self):
+        # Update body on GUI based on height and weight
+        body_top = 150
+        body_left = 120
+        body_right = body_left + (self.character.attributes["weight"] * 4)
+        body_bottom = body_top + (self.character.attributes["height"] * 2)
+        self.character_canvas.delete("body")
+
+        self.character_canvas.create_rectangle(body_left, body_top, body_right, body_bottom, fill="lightblue", tags="body")
+
+        head_width = self.character.attributes["weight"] * 5  # Head width scales with weight
+        head_height = self.character.attributes["height"] * 1.5  # Head height scales with height
+
+        # Position the head(s) above the body, keeping them centered
+        head_center_x = (body_left + body_right) / 2
+        head_top = body_top - head_height*0.8
+        head_left = head_center_x - (head_width / 1.7)
+        head_right = head_center_x + (head_width / 10)
+        head_bottom = body_top
+
+        self.head_right = head_right
+        self.head_left = head_left
+        self.head_top = head_top
+        self.head_bottom = head_bottom
+        self.head_width = head_width
+        self.head_height = head_height
+
+        # Clear existing heads
+        self.character_canvas.delete("head")
+        self.character_canvas.delete("head2")
+
+        if self.character.head_number == 1:
+            # Draw a single head
+            self.character_canvas.create_oval(
+                head_left, head_top, head_right+7, head_bottom, fill=self.head_color, tags="head"
+            )
+        elif self.character.head_number == 2:
+            # Draw two heads
+            spacing = 0.5  # Space between the two heads
+            first_head_left = head_left - (head_width / 2)
+            first_head_right = first_head_left + head_width
+            second_head_left = head_right 
+            second_head_right = second_head_left + head_width
+
+            # Draw first head
+            self.character_canvas.create_oval(
+                first_head_left, head_top, first_head_right, head_bottom, fill=self.head_color, tags="head"
+            )
+
+            # Draw second head
+            self.character_canvas.create_oval(
+                second_head_left, head_top, second_head_right, head_bottom, fill=self.head_color, tags="head2"
+            )

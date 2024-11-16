@@ -70,14 +70,21 @@ class Character:
         
         self._check_hungry()
         self._check_attributes()
+        self.gui.update_body_size()
 
     def _check_hungry(self):
-        if self.attributes["hunger"] >= MAX_HUNGER:
+        # Check if character has overeaten
+        if self.attributes["hunger"] > MAX_HUNGER:
             print(f"{self.name} isn't hungry, the extra food made them feel ill!")
-            # TODO make this depend on how much extra they ate?
-            self.attributes["health"] -= 20
-            self.attributes["fitness"] -= 5
-            self.attributes["happiness"] -= 5
+            over_hunger = self.attributes["hunger"] - MAX_HUNGER
+            if over_hunger <= 10:
+                self.attributes["health"] -= random.randint(1, 5)
+                self.attributes["fitness"] -= random.randint(1, 3)
+                self.attributes["happiness"] -= 5
+            else:
+                self.attributes["health"] -= random.randint(10, 20)
+                self.attributes["fitness"] -= random.randint(5, 10)
+                self.attributes["happiness"] -= random.randint(10, 15)
 
     def _healthy_effect(self):
         print(f"{self.name} feels healthier, fitter, and grows a little!")
@@ -100,8 +107,6 @@ class Character:
         self.attributes["fitness"] -= 5
         self.attributes["happiness"] += 10
         
-       # self.gui.fat()
-
     def _deadly_effect(self):
         print(f"{self.name} has eaten something deadly... uh oh!")
         self._kill_character()
@@ -141,6 +146,8 @@ class Character:
 
     def _neutral_effect(self, food: Food):
         print(f"{self.name} ate the {food.name}, but not much happened.")
+
+        self.attributes["hunger"] += random.randint(1, 5)
 
     #-----------------------------------------------------------
     # AGING/TIME EFFECTS
