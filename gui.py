@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import random
 from character import Character
 from constants import REFRESH_RATE, MIN_TIME_SPEED, MAX_TIME_SPEED
 from food import Food
@@ -79,7 +80,7 @@ class GUI:
 
     def setup_ui(self):
         self.root.title("Simulation UI")
-        self.root.geometry("1000x600")
+        self.root.geometry("1000x510")
 
         # Character Canvas
         self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
@@ -141,27 +142,45 @@ class GUI:
         tk.Label(self.interaction_frame, text="Food Interaction", font=("Arial", 14)).grid(row=0, column=0, columnspan=5)
 
         # Create list of foods
-        food_types = [  Food("Apple", "healthy"),
+        self.food_types = [  Food("Apple", "healthy"),
                         Food("Burger", "unhealthy"),
                         Food("Cookie", "neutral"),
                         Food("Magic Cookie", "radioactive"),
                         Food("Cyanide", "deadly"),
-                        Food("Mysterious Red Mushrooms", "healthy"),
-                        Food("Mysterious Blue Mushrooms", "radioactive"),
-                        Food("Mysterious Pink Mushrooms", "deadly"),
+                        Food("Red Mushrooms", "healthy"),
+                        Food("Blue Mushrooms", "radioactive"),
+                        Food("Pink Mushrooms", "deadly"),
+                        Food("Pizza", "unhealthy"),
+                        Food("Salad", "unhealthy"),
+                        Food("Spinach", "radioactive"),
+                        Food("Ice Cream", "unhealthy"),
+                        Food("Fruit Salad", "healthy"),
+                        Food("Pufferfish", "deadly"),
+                        Food("Wine", "neutral"),
+                        Food("Sandwich", "healthy"),
+                        Food("Cucumber", "healthy"),
                         ]
 
         # Create food buttons
-        for i, food in enumerate(food_types):
-            row = 1 if i < 4 else 2  # First 4 buttons in row 1, next 4 in row 2
-            col = i % 4  # Column resets after 4 buttons
-            button = tk.Button(self.interaction_frame, text=food_types[i].name, width=25, command=lambda f=food: self.feed_character(f))
-
-            button.grid(row=row, column=col, padx=5, pady=5)
-            self.food_buttons.append(button)
+        self.create_food_buttons()
         
         # Start time loop
         self.update_time()
+
+    def create_food_buttons(self):
+        # Clear existing buttons
+        for button in self.food_buttons:
+            button.destroy()
+        self.food_buttons.clear()
+
+        # Randomly pick up to 3 foods to create buttons for
+        random_foods = random.sample(self.food_types, min(3, len(self.food_types)))
+        for i, food in enumerate(random_foods):
+            row = 1
+            col = i
+            button = tk.Button(self.interaction_frame, text=food.name, width=25, command=lambda f=food: self.feed_character(f))
+            button.grid(row=1, column=i, padx=5, pady=5)
+            self.food_buttons.append(button)
 
     def feed_character(self, food: Food):
         # Feed character and update stats
@@ -189,5 +208,7 @@ class GUI:
         self.update_stats()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
+        if random.random() < 0.1: # random chance of resetting available foods
+            self.create_food_buttons()
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
