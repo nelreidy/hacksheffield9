@@ -21,8 +21,11 @@ class Character:
         }
         self.effects = []  # Stores special effects like "second head"
         self.time_speed = 1 # How fast time passes
-        self.head_colour = ""
+        self.head_colour = "peachpuff"
+        self.body_colour = "lightblue"
         self.head_number = 1
+        self.has_super_strength = False
+        self.time_since_effect = 0
 
     def set_gui(self, gui):
         self.gui = gui
@@ -43,6 +46,11 @@ class Character:
         
         if self.time_speed < MIN_TIME_SPEED:
             self.time_speed = MIN_TIME_SPEED
+
+        if self.time_since_effect > 3:
+            self.gui.normal_arms()
+            self.has_super_strength = False
+            self.time_since_effect = 0
 
     #-----------------------------------------------------------
     # EATING EFFECTS
@@ -89,13 +97,14 @@ class Character:
     def _healthy_effect(self):
         print(f"{self.name} feels healthier, fitter, and grows a little!")
 
-        self.attributes["hunger"] += 20
+        self.attributes["hunger"] += 5
         self.attributes["health"] += 10
         self.attributes["fitness"] += 5
         self.attributes["height"] += 1
         self.attributes["hair_length"] += 2
         self.attributes["happiness"] += 5
         
+        #self.gui.cure()
         if random.random() < 0.35: # low chance of curing you if apple eaten
             self.gui.cure()
 
@@ -133,6 +142,7 @@ class Character:
 
             if strange_effect == "super strength":
                 self.attributes["fitness"] += 20
+                self.gui.strong_arms()
             elif strange_effect == "green head":
                 if self.head_number == 2:
                     self.gui.grow_second_green_head()
@@ -143,8 +153,12 @@ class Character:
                     self.gui.grow_second_green_head()
                 else:
                     self.gui.grow_second_head()
+            elif strange_effect == "glowing skin":
+                self.gui.glowing_skin()
+    
 
     def _neutral_effect(self, food: Food):
+        self.attributes["hunger"] += 20
         print(f"{self.name} ate the {food.name}, but not much happened.")
 
         self.attributes["hunger"] += random.randint(1, 5)
@@ -186,3 +200,10 @@ class Character:
 
         self._aging_effect()
         self._check_attributes()
+
+    def get_age_string(self):
+        # Return a string of the age in year + months
+        years = int(self.age)
+        months = round((self.age - years) * 12)
+        return f"{years} years, {months} months"
+    

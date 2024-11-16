@@ -26,8 +26,6 @@ class GUI:
     # Function to make the character's head turn green (Radioactive)
     def turn_head_green(self):
         # Clear the head and redraw it with green fill
-        self.character_canvas.delete("head")
-        self.character_canvas.create_oval(50, 50, 50, 50, fill="green", tags="head")
         self.character.head_colour = "green"
 
     # Function to make the character's head turn normal (Alive/neutral/cured)
@@ -56,7 +54,10 @@ class GUI:
         self.character_canvas.create_oval(head_left, head_top, head_right, head_bottom, fill="peachpuff", tags="head")
 
         # Reset head color and number to default (single head)
+        print("cure")
         self.character.head_colour = "peachpuff"
+        self.character.body_colour = "lightblue"
+
         self.character.head_number = 1
 
         # Update the head position attributes for future use
@@ -115,10 +116,28 @@ class GUI:
         self.grow_second_head()
 
 
+    # Function to make skin glow
+    def glowing_skin(self):
+        self.character.body_colour = "gold"
+
+    
+    # Bigger arms = stronger
+    def strong_arms(self):
+        self.character_canvas.delete("arm")
+        self.character_canvas.create_rectangle(30, 155, 120, 200, fill="peachpuff", tags="arm")
+        self.character_canvas.create_rectangle(180, 155, 270, 200, fill="peachpuff", tags="arm")
+        self.character.has_super_strength = True
+
+    # After some time, arms go back to normal (small)
+    def normal_arms(self):
+        self.character_canvas.delete("arm") 
+        self.character_canvas.create_rectangle(60, 155, 120, 180, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 155, 240, 180, fill="peachpuff", tags="arm") # Right arm
+
 
     def setup_ui(self):
         self.root.title("Simulation UI")
-        self.root.geometry("800x600")
+        self.root.geometry("1000x600")
 
         # Character Canvas
         self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
@@ -130,14 +149,18 @@ class GUI:
         # Draw the character (basic placeholder)
         self.character_canvas.create_oval(100, 80, 150, 150, fill="peachpuff", tags="head")  # Head
         self.character_canvas.create_rectangle(120, 150, 180, 300, fill="lightblue", tags="body")  # Body
+        self.character_canvas.create_rectangle(60, 155, 120, 180, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 155, 240, 180, fill="peachpuff", tags="arm") # Right arm
+
 
         # Stats Section
         self.stats_frame = tk.Frame(self.root, width=200, height=400)
         self.stats_frame.grid(row=0, column=1, padx=10, pady=10, sticky="n")
 
-        tk.Label(self.stats_frame, text="Stats", font=("Arial", 14)).pack()
+        tk.Label(self.stats_frame, text=f"{self.character.name}'s Stats", font=("Arial", 14)).pack()
 
         stats = {
+            "Age": "XX years XX months",
             "Weight": "XX kg",
             "Height": "XXX cm",
             "Health": "XX",
@@ -167,7 +190,7 @@ class GUI:
 
         # Scenarios Section
         self.scenarios_frame = tk.Frame(self.root, width=300, height=200, bg="lightgray")
-        self.scenarios_frame.grid(row=1, column=1, padx=10, pady=10, sticky="n")
+        self.scenarios_frame.grid(row=0, column=2, padx=10, pady=10, sticky="n")
         tk.Label(self.scenarios_frame, text="Scenarios", font=("Arial", 14)).pack(anchor="w")
 
         # Interaction Section
@@ -177,7 +200,7 @@ class GUI:
         tk.Label(self.interaction_frame, text="Food Interaction", font=("Arial", 14)).grid(row=0, column=0, columnspan=5)
 
         # Create list of foods
-        food_types = [Food("Apple", "healthy"),
+        food_types = [  Food("Apple", "healthy"),
                         Food("Burger", "unhealthy"),
                         Food("Cookie", "neutral"),
                         Food("Magic Cookie", "radioactive"),
@@ -206,6 +229,7 @@ class GUI:
     
     def update_stats(self):
         # Update stats on the GUI
+        self.stat_labels["Age"].config(text=f"{self.character.get_age_string()}")
         self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']} kg")
         self.stat_labels["Height"].config(text=f"{self.character.attributes['height']} cm")
         self.stat_labels["Health"].config(text=f"{self.character.attributes['health']}")
@@ -223,6 +247,9 @@ class GUI:
         self.character.pass_time()
         self.update_stats()
         self.update_body_size()
+
+        if self.character.has_super_strength:
+            self.character.time_since_effect+=1
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
 
@@ -235,7 +262,7 @@ class GUI:
         body_bottom = body_top + (self.character.attributes["height"] * 2)
         self.character_canvas.delete("body")
 
-        self.character_canvas.create_rectangle(body_left, body_top, body_right, body_bottom, fill="lightblue", tags="body")
+        self.character_canvas.create_rectangle(body_left, body_top, body_right, body_bottom, fill=self.character.body_colour, tags="body")
 
         head_width = self.character.attributes["weight"] * 5  # Head width scales with weight
         head_height = self.character.attributes["height"] * 1.5  # Head height scales with height
@@ -247,12 +274,19 @@ class GUI:
         head_right = head_center_x + (head_width / 10)
         head_bottom = body_top
 
+        
+
+        print(body_left - body_right)
+
         self.head_right = head_right
         self.head_left = head_left
         self.head_top = head_top
         self.head_bottom = head_bottom
         self.head_width = head_width
         self.head_height = head_height
+
+        add = 7 + (body_right - body_left)*0.3
+
 
         # Clear existing heads
         self.character_canvas.delete("head")
@@ -261,7 +295,7 @@ class GUI:
         if self.character.head_number == 1:
             # Draw a single head
             self.character_canvas.create_oval(
-                head_left, head_top, head_right+7, head_bottom, fill=self.head_color, tags="head"
+                head_left, head_top, head_right+add, head_bottom, fill=self.character.head_colour, tags="head"
             )
         elif self.character.head_number == 2:
             # Draw two heads
@@ -273,10 +307,10 @@ class GUI:
 
             # Draw first head
             self.character_canvas.create_oval(
-                first_head_left, head_top, first_head_right, head_bottom, fill=self.head_color, tags="head"
+                first_head_left, head_top, first_head_right, head_bottom, fill=self.character.head_colour, tags="head"
             )
 
             # Draw second head
             self.character_canvas.create_oval(
-                second_head_left, head_top, second_head_right, head_bottom, fill=self.head_color, tags="head2"
+                second_head_left, head_top, second_head_right, head_bottom, fill=self.character.head_colour, tags="head2"
             )
