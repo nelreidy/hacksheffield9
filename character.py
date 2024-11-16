@@ -49,6 +49,7 @@ class Character:
         if self.time_since_effect > 3:
             self.gui.normal_arms()
             self.has_super_strength = False
+            self.time_since_effect = 0
 
     #-----------------------------------------------------------
     # EATING EFFECTS
@@ -88,7 +89,7 @@ class Character:
     def _healthy_effect(self):
         print(f"{self.name} feels healthier, fitter, and grows a little!")
 
-        self.attributes["hunger"] += 20
+        self.attributes["hunger"] += 5
         self.attributes["health"] += 10
         self.attributes["fitness"] += 5
         self.attributes["height"] += 1
