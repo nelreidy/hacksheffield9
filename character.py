@@ -114,8 +114,10 @@ class Character:
         self.attributes["hair_length"] += 2
         self.attributes["happiness"] += 5
         
-        if random.random() < 0.35: # low chance of curing you if apple eaten
-            self.gui.cure()
+        if self.head_colour == "green" or self.head_number > 1:
+            if random.random() < 0.35: # chance of curing you if healthy food eaten
+                self.gui.cure()
+                print(f"{self.name} was cured!")
 
     def _unhealthy_effect(self):
         print(f"{self.name} feels unfit but happier...")

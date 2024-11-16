@@ -217,7 +217,7 @@ class GUI:
     def update_stats(self):
         # Update stats on the GUI
         self.stat_labels["Age"].config(text=f"{self.character.get_age_string()}")
-        self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']} kg")
+        self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']:.2f} kg")
         self.stat_labels["Height"].config(text=f"{self.character.attributes['height']} cm")
         self.stat_labels["Health"].config(text=f"{self.character.attributes['health']}")
         self.stat_labels["Fitness"].config(text=f"{self.character.attributes['fitness']}")
