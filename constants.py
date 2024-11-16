@@ -24,9 +24,10 @@ BASE_WEIGHT = 3
 # Hair length in CM
 BASE_HAIR_LENGTH = 0
 
-# Hunger level (0 = starving)
+# Hunger level (0 = lowest)
 BASE_HUNGER = 30
 MAX_HUNGER = 100
+STARVING_LEVEL = 10
 
 RADIOACTIVE_EFFECTS = ["second head", 
                        "glowing skin", 

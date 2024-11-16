@@ -19,6 +19,7 @@ class Character:
             "hunger": BASE_HUNGER,
         }
         self.effects = []  # Stores special effects like "second head"
+        self.time_speed = 1 # How fast time passes
 
     def _check_attributes(self):
         # Ensure attributes don't go below zero or exceed reasonable limits
@@ -109,7 +110,7 @@ class Character:
         print(f"{self.name} ate the {food.name}, but not much happened.")
 
     #-----------------------------------------------------------
-    # AGING EFFECTS
+    # AGING/TIME EFFECTS
 
     def _kill_character(self):
         # Kill the character
@@ -124,3 +125,19 @@ class Character:
         elif self.age >= 80:
             self.attributes["health"] -= 5
             print(f"{self.name} is feeling the effects of old age...")
+
+    def pass_time(self):
+        # Pass 1 day, adjusted by time speed
+        days = self.time_speed
+        self.age += days / 365
+        self.attributes["hunger"] -= days * 0.5
+
+        if self.attributes["hunger"] <= 0.0:
+            print(f"{self.name} starved to death!")
+            self._kill_character()
+        elif self.attributes["hunger"] <= STARVING_LEVEL:
+            self.attributes["health"] -= 5
+            print(f"{self.name} is starving!")
+        
+        self._aging_effect()
+        self._check_attributes()
