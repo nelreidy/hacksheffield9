@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from character import Character
+from constants import REFRESH_RATE, MIN_TIME_SPEED, MAX_TIME_SPEED
 from food import Food
 
 class GUI:
@@ -73,10 +74,13 @@ class GUI:
         # Time Speed Slider
         self.time_frame = tk.Frame(self.stats_frame)
         self.time_frame.pack(anchor="w", pady=10)
-        tk.Label(self.time_frame, text="Time Speed:", font=("Arial", 12)).pack(side="left")
-        time_slider = ttk.Scale(self.time_frame, from_=0.5, to=4, orient="horizontal", length=150)
-        time_slider.set(1)  # Default speed
-        time_slider.pack(side="left")
+        tk.Label(self.time_frame, text="Simulation Speed:", font=("Arial", 12)).pack(side="left")
+        self.time_slider = ttk.Scale(self.time_frame, from_=MIN_TIME_SPEED, to=MAX_TIME_SPEED, orient="horizontal", length=150)
+        self.time_slider.set(1)  # Default speed
+        self.time_slider.pack(side="left")
+
+        # Bind slider to update character's time_speed
+        self.time_slider.bind("<Motion>", self.update_time_speed)
 
         # Scenarios Section
         self.scenarios_frame = tk.Frame(self.root, width=300, height=200, bg="lightgray")
@@ -107,10 +111,14 @@ class GUI:
             button = tk.Button(self.interaction_frame, text=food_types[i].name, width=10, command=lambda f=food: self.feed_character(f))
             button.grid(row=row, column=col, padx=5, pady=5)
             self.food_buttons.append(button)
+        
+        # Start time loop
+        self.update_time()
 
     def feed_character(self, food: Food):
         # Feed character and update stats
         self.character.eat(food)
+        self.update_stats()
     
     def update_stats(self):
         # Update stats on the GUI
@@ -121,3 +129,13 @@ class GUI:
         self.stat_labels["Happiness"].config(text=f"{self.character.attributes['happiness']}")
         self.stat_labels["Hunger"].config(text=f"{self.character.attributes['hunger']}")
         self.stat_labels["Hair Length"].config(text=f"{self.character.attributes['hair_length']} cm")
+
+    def update_time_speed(self, event):
+        # Update time_speed based on slider value
+        self.character.time_speed = self.time_slider.get()
+
+    def update_time(self):
+        # Simulate time passing
+        self.character.pass_time()
+        self.update_stats()
+        self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second

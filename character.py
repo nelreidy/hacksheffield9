@@ -34,6 +34,9 @@ class Character:
         if self.attributes["health"] == 0 and not self.dead:
             self.dead = True
             print(f"{self.name} has died due to poor health!")
+        
+        if self.time_speed < MIN_TIME_SPEED:
+            self.time_speed = MIN_TIME_SPEED
 
     #-----------------------------------------------------------
     # EATING EFFECTS

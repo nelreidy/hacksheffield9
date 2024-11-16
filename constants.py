@@ -33,3 +33,10 @@ RADIOACTIVE_EFFECTS = ["second head",
                        "glowing skin", 
                        "super strength"
                        ]
+
+# How often pass_time() is called
+REFRESH_RATE = 1000
+
+# Time speed
+MIN_TIME_SPEED = 0.1
+MAX_TIME_SPEED = 5
