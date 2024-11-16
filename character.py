@@ -20,6 +20,23 @@ class Character:
         }
         self.effects = []  # Stores special effects like "second head"
 
+    def _check_attributes(self):
+        # Ensure attributes don't go below zero or exceed reasonable limits
+        self.attributes["health"] = max(0, min(self.attributes["health"], MAX_HEALTH))
+        self.attributes["fitness"] = max(0, min(self.attributes["fitness"], MAX_FITNESS))
+        self.attributes["happiness"] = max(0, min(self.attributes["happiness"], MAX_HAPPINESS))
+        self.attributes["height"] = max(BASE_HEIGHT, self.attributes["height"], MAX_HEIGHT)
+        self.attributes["weight"] = max(0, self.attributes["weight"])
+        self.attributes["hair_length"] = max(0, self.attributes["hair_length"])
+        self.attributes["hunger"] = max(0, min(self.attributes["hunger"], MAX_HUNGER))
+
+        if self.attributes["health"] == 0 and not self.dead:
+            self.dead = True
+            print(f"{self.name} has died due to poor health!")
+
+    #-----------------------------------------------------------
+    # EATING EFFECTS
+
     def eat(self, food: Food):
         # Apply effects to character attributes based on food being consumed
         if self.dead:
@@ -63,9 +80,7 @@ class Character:
 
     def _deadly_effect(self):
         print(f"{self.name} has eaten something deadly... uh oh!")
-
-        self.attributes["health"] = 0
-        self.dead = True
+        self._kill_character()
 
     def _radioactive_effect(self):
         print(f"{self.name} has eaten radioactivate food and now something strange is occurring...")
@@ -93,16 +108,19 @@ class Character:
     def _neutral_effect(self, food: Food):
         print(f"{self.name} ate the {food.name}, but not much happened.")
 
-    def _check_attributes(self):
-        # Ensure attributes don't go below zero or exceed reasonable limits
-        self.attributes["health"] = max(0, min(self.attributes["health"], MAX_HEALTH))
-        self.attributes["fitness"] = max(0, min(self.attributes["fitness"], MAX_FITNESS))
-        self.attributes["happiness"] = max(0, min(self.attributes["happiness"], MAX_HAPPINESS))
-        self.attributes["height"] = max(BASE_HEIGHT, self.attributes["height"], MAX_HEIGHT)
-        self.attributes["weight"] = max(0, self.attributes["weight"])
-        self.attributes["hair_length"] = max(0, self.attributes["hair_length"])
-        self.attributes["hunger"] = max(0, min(self.attributes["hunger"], MAX_HUNGER))
+    #-----------------------------------------------------------
+    # AGING EFFECTS
 
-        if self.attributes["health"] == 0 and not self.dead:
-            self.dead = True
-            print(f"{self.name} has died due to poor health!")
+    def _kill_character(self):
+        # Kill the character
+        self.attributes["health"] = 0
+        self.dead = True
+
+    def _aging_effect(self):
+        # Apply effects based on age of character
+        if self.age >= 150:
+            self._kill_character()
+            print(f"{self.name} has died of old age :(")
+        elif self.age >= 80:
+            self.attributes["health"] -= 5
+            print(f"{self.name} is feeling the effects of old age...")
