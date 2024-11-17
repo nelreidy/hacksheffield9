@@ -209,18 +209,18 @@ class GUI:
 
     def setup_ui(self):
         self.root.title("Grown your own Human")
-        self.root.geometry("900x560")
+        self.root.geometry("1200x560")
 
-        # Character Canvas
-        self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
-        self.character_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10)
-
+        # Logging frame
         self.log_frame = tk.Frame(self.root, width=600, height=100, bg="white" )
         self.log_frame.grid(row=1, column=1, columnspan=2, padx=10, pady=10 )
 
         self.log_text = tk.Text(self.log_frame, width=70, height=5, wrap=tk.WORD, bg="white")
         self.log_text.pack(pady=5)
 
+        # Character Canvas
+        self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
+        self.character_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10)
 
         self.character_canvas = tk.Canvas(self.character_frame, width=300, height=400, bg="white")
         self.character_canvas.pack()
@@ -232,7 +232,6 @@ class GUI:
         self.character_canvas.create_rectangle(130, 155, 150, 160, fill="peachpuff", tags="arm") # Right arm
         
         self.arm_height = 15
-        
 
         # Stats Section
         self.stats_frame = tk.Frame(self.root, width=200, height=400)
@@ -272,23 +271,30 @@ class GUI:
         # Achievements Section
         self.achievements_frame = tk.Frame(self.root, width=300, height=400)
         self.achievements_frame.grid(row=0, column=2, padx=10, pady=10, rowspan=2, sticky="n")
-        tk.Label(self.achievements_frame, text="Achievements", font=("Arial", 14)).pack(anchor="w")
+        tk.Label(self.achievements_frame, text="Achievements", font=("Arial", 14)).grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 10))
         
         self.achievements = {
             "Keep alive for 1 year": False,
-            "Keep alive for 2 years": False,
             "Keep alive for 5 years": False,
             "Keep alive for 10 years": False,
+            "Keep alive for 25 years": False,
             "Feed 5 healthy foods in a row": False,
             "Avoid unhealthy food for 1 year": False,
             "Avoid radioactive food for 1 year": False,
+            "Go on 20 dates": False,
+            "Go on 5 successful dates in a row": False,
             "Rapunzel": False,
         }
 
         self.achievement_labels = {}
-        for achievement, status in self.achievements.items():
+        max_per_col = 7
+        for i, (achievement, status) in enumerate(self.achievements.items()):
+            col = i // max_per_col
+            row = i % max_per_col + 1
+
+            # Create label
             label = tk.Label(self.achievements_frame, text=achievement, font=("Arial", 12), bg="lightgray")
-            label.pack(anchor="w", pady=5)
+            label.grid(row=row, column=col, sticky="w", padx=5, pady=5)
             self.achievement_labels[achievement] = label
 
         # Interaction Section
@@ -413,7 +419,7 @@ class GUI:
         self.check_achievements()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
-        if random.random() < 0.1: # random chance of resetting available foods
+        if random.random() < min(0.1 * self.character.time_speed, 1): # random chance of resetting available foods
             self.create_food_buttons()
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
@@ -504,12 +510,12 @@ class GUI:
         # Alive achievements
         if self.character.age >= 1 and not self.achievements["Keep alive for 1 year"]:
             self.update_achievement_status("Keep alive for 1 year")
-        if self.character.age >= 2 and not self.achievements["Keep alive for 2 years"]:
-            self.update_achievement_status("Keep alive for 2 years")
         if self.character.age >= 5 and not self.achievements["Keep alive for 5 years"]:
             self.update_achievement_status("Keep alive for 5 years")
         if self.character.age >= 10 and not self.achievements["Keep alive for 10 years"]:
             self.update_achievement_status("Keep alive for 10 years")
+        if self.character.age >= 25 and not self.achievements["Keep alive for 25 years"]:
+            self.update_achievement_status("Keep alive for 25 years")
         
         # 5 healthy foods in a row
         if self.character.healthy_food_streak >= 5 and not self.achievements["Feed 5 healthy foods in a row"]:
@@ -526,3 +532,9 @@ class GUI:
         # Rapunzel (long hair)
         if self.character.attributes["hair_length"] >= 500 and not self.achievements["Rapunzel"]:
             self.update_achievement_status("Rapunzel")
+        
+        # Dating achievements
+        if self.character.successful_dates_streak >= 5 and not self.achievements["Go on 5 successful dates in a row"]:
+            self.update_achievement_status("Go on 5 successful dates in a row")
+        if self.character.total_dates >= 20 and not self.achievements["Go on 20 dates"]:
+            self.update_achievement_status("Go on 20 dates")

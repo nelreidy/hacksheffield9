@@ -31,6 +31,8 @@ class Character:
         self.healthy_food_streak = 0
         self.avoided_unhealthy_time = 0
         self.avoided_radioactive_time = 0
+        self.successful_dates_streak = 0
+        self.total_dates = 0
 
     def set_gui(self, gui):
         self.gui = gui
@@ -190,6 +192,10 @@ class Character:
 
     def _aging_potion_effect(self, food: Food):
         self.age+=5
+        if self.attributes["height"] < MAX_HEIGHT:
+            self.attributes["height"] += MAX_HEIGHT / 5
+            self.attributes["weight"] += 5
+        
         print(f"{self.name} drank the {food.name}, now they feel... old...")
 
     #-----------------------------------------------------------
@@ -247,10 +253,18 @@ class Character:
     def go_on_date(self):
         # Go on a date
         print(f"{self.name} is going on a date!")
+        self.total_dates += 1
         if random.random() < 0.05:
             # Very slim chance of meeting a serial killer
             print(f"{self.name}'s date was a serial killer... oh dear.")
+            self.successful_dates_streak = 0
             self._kill_character()
+        elif random.random() < 0.4:
+            # Date goes badly
+            print(f"{self.name}'s date went badly...")
+            self.successful_dates_streak = 0
+            self.attributes["happiness"] -= random.randint(15, 30)
         else:
             print(f"{self.name} had a successful date!")
+            self.successful_dates_streak += 1
             self.attributes["happiness"] += 20
