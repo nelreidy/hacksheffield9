@@ -87,13 +87,17 @@ class GUI:
         rip_y = coffin_y1 + 40
         self.character_canvas.create_text(rip_x, rip_y, text="RIP", font=("Arial", 20, "bold"), fill="black")
 
-        # Disable buttons
+        # Disable inputs
         for button in self.all_buttons:
             try:
                 button.config(state=tk.DISABLED)
             except _tkinter.TclError:
                 # Button may have already been destroyed
                 pass
+        self.cut_hair_button.config(state=tk.DISABLED)
+        self.exercise_button.config(state=tk.DISABLED)
+        self.date_button.config(state=tk.DISABLED)
+        self.time_slider.config(state=tk.DISABLED)
 
     # Function to make the character grow a 2nd head
     def grow_second_head(self):
@@ -231,7 +235,6 @@ class GUI:
         self.time_slider = ttk.Scale(self.time_frame, from_=MIN_TIME_SPEED, to=MAX_TIME_SPEED, orient="horizontal", length=150)
         self.time_slider.set(1)  # Default speed
         self.time_slider.pack(side="left")
-        self.all_buttons.append(self.time_slider)
 
         # Bind slider to update character's time_speed
         self.time_slider.bind("<Motion>", self.update_time_speed)
@@ -288,17 +291,14 @@ class GUI:
         self.create_food_buttons()
 
         # Create action buttons
-        cut_hair_button = tk.Button(self.interaction_frame, text="Cut Hair", width=25, command=self.cut_hair)
-        cut_hair_button.grid(row=3, column=0, padx=5, pady=10)
-        self.all_buttons.append(cut_hair_button)
+        self.cut_hair_button = tk.Button(self.interaction_frame, text="Cut Hair", width=25, command=self.cut_hair)
+        self.cut_hair_button.grid(row=3, column=0, padx=5, pady=10)
 
-        exercise_button = tk.Button(self.interaction_frame, text="Exercise", width=25, command=self.exercise)
-        exercise_button.grid(row=3, column=1, padx=5, pady=10)  
-        self.all_buttons.append(exercise_button)
+        self.exercise_button = tk.Button(self.interaction_frame, text="Exercise", width=25, command=self.exercise)
+        self.exercise_button.grid(row=3, column=1, padx=5, pady=10)  
 
         self.date_button = tk.Button(self.interaction_frame, text="Date", width=25, command=self.go_on_date, state=tk.DISABLED)
         self.date_button.grid(row=3, column=2, padx=5, pady=10)  
-        self.all_buttons.append(self.date_button)
 
         # Start time loop
         self.update_time()
@@ -309,12 +309,11 @@ class GUI:
         self.log_text.insert(tk.END, new_text)  # Insert the new text
         self.log_text.config(state=tk.DISABLED)  # Disable editing again
 
-
     def create_food_buttons(self):
         # Clear existing buttons
-        for i, button in enumerate(self.food_buttons):
-            self.all_buttons.pop(i)
+        for button in self.food_buttons:
             button.destroy()
+        self.all_buttons = []
         self.food_buttons.clear()
 
         # Randomly pick up to 3 foods to create buttons for
