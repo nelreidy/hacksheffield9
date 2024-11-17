@@ -8,6 +8,10 @@ from food import Food
 class Character:
     def __init__(self, name: str):
         self.name = name
+        self._initialise()
+
+
+    def _initialise(self):
         self.dead = False
         self.age = STARTING_AGE
         self.attributes = { # Various attributes
@@ -34,6 +38,10 @@ class Character:
 
     def set_gui(self, gui):
         self.gui = gui
+
+    def reset(self):
+        self._initialise()
+        
 
     def _check_attributes(self):
         # Ensure attributes don't go below zero or exceed reasonable limits
