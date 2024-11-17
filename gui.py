@@ -435,9 +435,6 @@ class GUI:
             strength_scale = (body_top - body_bottom)*0.5
             arm_t_scale = arm_scale*2
 
-        print(f"body_top {body_top}")
-        print(f"arms {body_top+arm_t_scale}")
-
         # Draw arms based on scaled values
         self.character_canvas.delete("arm")
         self.character_canvas.create_rectangle(body_left - width_scale, body_top+arm_t_scale, body_left, body_top +strength_scale , fill="peachpuff", tags="arm")  # Left arm
