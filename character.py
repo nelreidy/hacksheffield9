@@ -227,8 +227,8 @@ class Character:
         self.attributes["hair_length"] += days * 0.5
 
         # Update achievements
-        self.avoided_radioactive_time += self.time_speed
-        self.avoided_unhealthy_time += self.time_speed
+        self.avoided_radioactive_time += days * 7
+        self.avoided_unhealthy_time += days * 7
 
         if self.attributes["hunger"] <= 0.0:
             self.gui.update_log(f"{self.name} starved to death!")
