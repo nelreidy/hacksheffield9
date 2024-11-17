@@ -31,7 +31,37 @@ class GUI:
     # Function to make the character's head turn green (Radioactive)
     def turn_head_green(self):
         # Clear the head and redraw it with green fill
+        self.character_canvas.delete("head")
+
+        # Use the head width and height attributes to determine the size of the head
+        head_width = self.head_right - self.head_left
+        head_height = self.head_bottom - self.head_top
+
+        # Calculate the center of the body and position the head accordingly
+        body_left = 120  # Assuming body_left is the starting point of the body
+        body_right = body_left + (self.character.attributes["weight"] * 4)
+        body_top = 150
+        body_bottom = body_top + (self.character.attributes["height"] * 2)
+
+        # Calculate the center for the head
+        head_center_x = (body_left + body_right) / 2
+        head_top = body_top - head_height
+        head_left = head_center_x - (head_width / 2)
+        head_right = head_center_x + (head_width / 1) 
+        head_bottom = head_top + head_height
+
+        # Redraw the head centered at the correct position
+        self.character_canvas.create_oval(head_left, head_top, head_right, head_bottom, fill="green", tags="head")
+
+        # Reset head color and number to default (single head)
+        
         self.character.head_colour = "green"
+
+        # Update the head position attributes for future use
+        self.head_left = head_left
+        self.head_right = head_right
+        self.head_top = head_top
+        self.head_bottom = head_bottom
 
     # Function to make the character's head turn normal (Alive/neutral/cured)
     def cure(self):
@@ -89,13 +119,17 @@ class GUI:
         rip_y = coffin_y1 + 40
         self.character_canvas.create_text(rip_x, rip_y, text="RIP", font=("Arial", 20, "bold"), fill="black")
 
-        # Disable buttons
+        # Disable inputs
         for button in self.all_buttons:
             try:
                 button.config(state=tk.DISABLED)
             except _tkinter.TclError:
                 # Button may have already been destroyed
                 pass
+        self.cut_hair_button.config(state=tk.DISABLED)
+        self.exercise_button.config(state=tk.DISABLED)
+        self.date_button.config(state=tk.DISABLED)
+        self.time_slider.config(state=tk.DISABLED)
 
     # Function to make the character grow a 2nd head
     def grow_second_head(self):
@@ -110,7 +144,7 @@ class GUI:
 
         # Dimensions for the second head (placed to the right of the first head)
         head_width = first_head_right - first_head_left
-        second_head_left = first_head_right + 10  # Add spacing of 10 pixels
+        second_head_left = first_head_right + 5  # Add spacing of 5 pixels
         second_head_right = second_head_left + head_width
         second_head_top = first_head_top
         second_head_bottom = first_head_bottom
@@ -123,10 +157,10 @@ class GUI:
 
         self.head_left = self.head_left - self.head_width
         self.head_right = self.head_right - self.head_width
-
+        # Draw the second head
         self.character_canvas.create_oval(
             self.head_left+self.head_width/2, self.head_top,  self.head_right+self.head_width/2, self.head_bottom,
-            fill="peachpuff", tags="head2"
+            fill="peachpuff", tags="head"
         )
 
         # Update the character's head count
@@ -135,7 +169,7 @@ class GUI:
     # Function to make the character grow a 2nd green head
     def grow_second_green_head(self):
         # Clear the head and redraw 2 with green fill
-        self.head_color = "green"
+        self.character.head_color = "green"
         self.grow_second_head()
 
 
@@ -155,8 +189,8 @@ class GUI:
         arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width also scales with height
 
         # Adjust arm positions based on the scaling
-        self.character_canvas.create_rectangle(30, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 270, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
+        self.character_canvas.create_rectangle(30-arm_width, 105, 120, 135 + arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 135, 270+arm_width, 105 + arm_length, fill="peachpuff", tags="arm")  # Right arm
 
         self.character.has_super_strength = True
 
@@ -171,8 +205,8 @@ class GUI:
         arm_width = 15 + (self.character.attributes["height"] * 0.03)  # Arm width based on height
 
         # Adjust arm positions based on the scaling
-        self.character_canvas.create_rectangle(60, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 240, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
+        self.character_canvas.create_rectangle(60-arm_width, 115, 120, 115 + arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 115, 240+arm_width, 115 + arm_length, fill="peachpuff", tags="arm")  # Right arm
 
     def restart(self):
         # Restart the character and the UI
@@ -211,12 +245,9 @@ class GUI:
 
     def setup_ui(self):
         self.root.title("Grown your own Human")
-        self.root.geometry("900x560")
+        self.root.geometry("1200x560")
 
-        # Character Canvas
-        self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
-        self.character_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10)
-
+        # Logging frame
         self.log_frame = tk.Frame(self.root, width=600, height=100, bg="white" )
         self.log_frame.grid(row=1, column=1, columnspan=2, padx=10, pady=10 )
 
@@ -225,7 +256,6 @@ class GUI:
 
         self.restart_button = tk.Button(self.root, text="Restart", width=25, command= self.restart)
         self.restart_button.grid(row=2, column=2, padx=20, pady=23, sticky="se")
-
 
         self.character_canvas = tk.Canvas(self.character_frame, width=300, height=400, bg="white")
         self.character_canvas.pack()
@@ -237,7 +267,6 @@ class GUI:
         self.character_canvas.create_rectangle(130, 155, 150, 160, fill="peachpuff", tags="arm") # Right arm
         
         self.arm_height = 15
-        
 
         # Stats Section
         self.stats_frame = tk.Frame(self.root, width=200, height=400)
@@ -270,7 +299,6 @@ class GUI:
         self.time_slider = ttk.Scale(self.time_frame, from_=MIN_TIME_SPEED, to=MAX_TIME_SPEED, orient="horizontal", length=150)
         self.time_slider.set(1)  # Default speed
         self.time_slider.pack(side="left")
-        self.all_buttons.append(self.time_slider)
 
         # Bind slider to update character's time_speed
         self.time_slider.bind("<Motion>", self.update_time_speed)
@@ -278,23 +306,30 @@ class GUI:
         # Achievements Section
         self.achievements_frame = tk.Frame(self.root, width=300, height=400)
         self.achievements_frame.grid(row=0, column=2, padx=10, pady=10, rowspan=2, sticky="n")
-        tk.Label(self.achievements_frame, text="Achievements", font=("Arial", 14)).pack(anchor="w")
+        tk.Label(self.achievements_frame, text="Achievements", font=("Arial", 14)).grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 10))
         
         self.achievements = {
             "Keep alive for 1 year": False,
-            "Keep alive for 2 years": False,
             "Keep alive for 5 years": False,
             "Keep alive for 10 years": False,
+            "Keep alive for 25 years": False,
             "Feed 5 healthy foods in a row": False,
             "Avoid unhealthy food for 1 year": False,
             "Avoid radioactive food for 1 year": False,
+            "Go on 20 dates": False,
+            "Go on 5 successful dates in a row": False,
             "Rapunzel": False,
         }
 
         self.achievement_labels = {}
-        for achievement, status in self.achievements.items():
+        max_per_col = 7
+        for i, (achievement, status) in enumerate(self.achievements.items()):
+            col = i // max_per_col
+            row = i % max_per_col + 1
+
+            # Create label
             label = tk.Label(self.achievements_frame, text=achievement, font=("Arial", 12), bg="lightgray")
-            label.pack(anchor="w", pady=5)
+            label.grid(row=row, column=col, sticky="w", padx=5, pady=5)
             self.achievement_labels[achievement] = label
 
         # Interaction Section
@@ -327,17 +362,14 @@ class GUI:
         self.create_food_buttons()
 
         # Create action buttons
-        cut_hair_button = tk.Button(self.interaction_frame, text="Cut Hair", width=25, command=self.cut_hair)
-        cut_hair_button.grid(row=3, column=0, padx=5, pady=10)
-        self.all_buttons.append(cut_hair_button)
+        self.cut_hair_button = tk.Button(self.interaction_frame, text="Cut Hair", width=25, command=self.cut_hair)
+        self.cut_hair_button.grid(row=3, column=0, padx=5, pady=10)
 
-        exercise_button = tk.Button(self.interaction_frame, text="Exercise", width=25, command=self.exercise)
-        exercise_button.grid(row=3, column=1, padx=5, pady=10)  
-        self.all_buttons.append(exercise_button)
+        self.exercise_button = tk.Button(self.interaction_frame, text="Exercise", width=25, command=self.exercise)
+        self.exercise_button.grid(row=3, column=1, padx=5, pady=10)  
 
         self.date_button = tk.Button(self.interaction_frame, text="Date", width=25, command=self.go_on_date, state=tk.DISABLED)
         self.date_button.grid(row=3, column=2, padx=5, pady=10)  
-        self.all_buttons.append(self.date_button)
 
         # Start time loop
         self.update_time()
@@ -348,12 +380,11 @@ class GUI:
         self.log_text.insert(tk.END, new_text)  # Insert the new text
         self.log_text.config(state=tk.DISABLED)  # Disable editing again
 
-
     def create_food_buttons(self):
         # Clear existing buttons
-        for i, button in enumerate(self.food_buttons):
-            self.all_buttons.pop(i)
+        for button in self.food_buttons:
             button.destroy()
+        self.all_buttons = []
         self.food_buttons.clear()
 
         # Randomly pick up to 3 foods to create buttons for
@@ -427,7 +458,7 @@ class GUI:
         self.check_achievements()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
-        if random.random() < 0.1: # random chance of resetting available foods
+        if random.random() < min(0.1 * self.character.time_speed, 1): # random chance of resetting available foods
             self.create_food_buttons()
 
         if not self.character.dead:
@@ -481,10 +512,10 @@ class GUI:
         elif self.character.head_number == 2:
             head_bottom += 20
             # Draw two heads
-            spacing = 0.5  # Space between the two heads
+            spacing = 5  # Space between the two heads
             first_head_left = head_left - (head_width / 2)
             first_head_right = first_head_left + head_width
-            second_head_left = head_right 
+            second_head_left = head_right + spacing
             second_head_right = second_head_left + head_width
 
             # Draw first head
@@ -511,9 +542,8 @@ class GUI:
 
         # Draw arms based on scaled values
         self.character_canvas.delete("arm")
-        self.character_canvas.delete("arm2")
         self.character_canvas.create_rectangle(body_left - width_scale, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm2")  # R
+        self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm")  # R
 
     def update_achievement_status(self, achievement_name):
         # Update achievement to completed
@@ -524,12 +554,12 @@ class GUI:
         # Alive achievements
         if self.character.age >= 1 and not self.achievements["Keep alive for 1 year"]:
             self.update_achievement_status("Keep alive for 1 year")
-        if self.character.age >= 2 and not self.achievements["Keep alive for 2 years"]:
-            self.update_achievement_status("Keep alive for 2 years")
         if self.character.age >= 5 and not self.achievements["Keep alive for 5 years"]:
             self.update_achievement_status("Keep alive for 5 years")
         if self.character.age >= 10 and not self.achievements["Keep alive for 10 years"]:
             self.update_achievement_status("Keep alive for 10 years")
+        if self.character.age >= 25 and not self.achievements["Keep alive for 25 years"]:
+            self.update_achievement_status("Keep alive for 25 years")
         
         # 5 healthy foods in a row
         if self.character.healthy_food_streak >= 5 and not self.achievements["Feed 5 healthy foods in a row"]:
@@ -546,3 +576,9 @@ class GUI:
         # Rapunzel (long hair)
         if self.character.attributes["hair_length"] >= 500 and not self.achievements["Rapunzel"]:
             self.update_achievement_status("Rapunzel")
+        
+        # Dating achievements
+        if self.character.successful_dates_streak >= 5 and not self.achievements["Go on 5 successful dates in a row"]:
+            self.update_achievement_status("Go on 5 successful dates in a row")
+        if self.character.total_dates >= 20 and not self.achievements["Go on 20 dates"]:
+            self.update_achievement_status("Go on 20 dates")
