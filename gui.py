@@ -14,7 +14,6 @@ class GUI:
         self.stat_labels = {}
         self.food_buttons = []
         self.all_buttons = []
-        self.restarting = False
         self.after_id = None
 
         self.head_left = 0 
@@ -98,8 +97,6 @@ class GUI:
 
     def restart(self):
         # Restart the character and the UI
-        self.restarting = True
-
         if self.after_id is not None:
             self.root.after_cancel(self.after_id)
             self.after_id = None
@@ -107,8 +104,6 @@ class GUI:
         self.update_log("Restarting!")
         self.character.reset()
         self.reset_ui() 
-
-        self.restarting = False
 
     def reset_ui(self):
 
@@ -307,9 +302,6 @@ class GUI:
         self.character.attributes['happiness'] += random.randint(3, 5)
 
     def update_stats(self):
-        if (self.restarting):
-            return
-
         # Update stats on the GUI
         self.stat_labels["Age"].config(text=f"{self.character.get_age_string()}")
         self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']:.2f} kg")
@@ -355,9 +347,6 @@ class GUI:
             self.after_id = self.root.after(REFRESH_RATE, self.update_time)
 
     def update_body_size(self):
-
-        if (self.restarting):
-            return
         # Update body on GUI based on height and weight
         if (self.character.dead):
             return
