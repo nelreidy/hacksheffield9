@@ -94,36 +94,6 @@ class GUI:
         self.date_button.config(state=tk.DISABLED)
         self.time_slider.config(state=tk.DISABLED)
 
-    # Bigger arms = stronger
-    def strong_arms(self):
-        # Delete existing arms
-        self.character_canvas.delete("arm")
-
-        # Scaling factor for arms based on character's size (weight and height)
-        arm_scale = self.character.attributes["weight"] * 0.3  # You can adjust this multiplier for better scaling
-        arm_length = 45 + arm_scale  # Length of the arms will increase with the character's size
-        arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width also scales with height
-
-        # Adjust arm positions based on the scaling
-        self.character_canvas.create_rectangle(30, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 270, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
-
-        self.character.has_super_strength = True
-
-    def normal_arms(self):
-        # Delete existing arms
-        self.character_canvas.delete("arm")
-
-        # Scaling factor for arms based on character's size (weight and height)
-        arm_scale = self.character.attributes["weight"] * 0.2  # Adjust scaling based on weight
-        arm_length = 30 + arm_scale  # Default arm length, with a scaling factor
-        arm_width = 15 + (self.character.attributes["height"] * 0.03)  # Arm width based on height
-
-        # Adjust arm positions based on the scaling
-        self.character_canvas.create_rectangle(60, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 240, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
-
-
     def setup_ui(self):
         self.root.title("Grown your own Human")
         self.root.geometry("1200x560")
