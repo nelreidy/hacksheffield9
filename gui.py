@@ -14,6 +14,7 @@ class GUI:
         self.stat_labels = {}
         self.food_buttons = []
         self.all_buttons = []
+        self.restarting = False
         self.after_id = None
 
         self.head_left = 0 
@@ -97,6 +98,8 @@ class GUI:
 
     def restart(self):
         # Restart the character and the UI
+        self.restarting = True
+
         if self.after_id is not None:
             self.root.after_cancel(self.after_id)
             self.after_id = None
@@ -104,6 +107,8 @@ class GUI:
         self.update_log("Restarting!")
         self.character.reset()
         self.reset_ui() 
+
+        self.restarting = False
 
     def reset_ui(self):
 
@@ -302,6 +307,9 @@ class GUI:
         self.character.attributes['happiness'] += random.randint(3, 5)
 
     def update_stats(self):
+        if (self.restarting):
+            return
+
         # Update stats on the GUI
         self.stat_labels["Age"].config(text=f"{self.character.get_age_string()}")
         self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']:.2f} kg")
@@ -347,6 +355,9 @@ class GUI:
             self.after_id = self.root.after(REFRESH_RATE, self.update_time)
 
     def update_body_size(self):
+
+        if (self.restarting):
+            return
         # Update body on GUI based on height and weight
         if (self.character.dead):
             return
@@ -388,7 +399,7 @@ class GUI:
                 head_left, head_top, head_right+add, head_bottom, fill=self.character.head_colour, tags="head"
             )
         elif self.character.head_number == 2:
-            head_bottom += 10
+            head_bottom += 20
             # Draw two heads
             spacing = 5  # Space between the two heads
             first_head_left = head_left - (head_width / 2)
@@ -420,8 +431,8 @@ class GUI:
 
         # Draw arms based on scaled values
         self.character_canvas.delete("arm")
-        self.character_canvas.create_rectangle(body_left - width_scale*arm_width, body_top +strength_scale, body_left, body_top +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(body_right + width_scale, body_top +strength_scale, body_right, body_top +strength_scale + arm_length, fill="peachpuff", tags="arm")  # R
+        self.character_canvas.create_rectangle(body_left - width_scale - 5, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(body_right + width_scale + 5, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm")  # R
 
     def update_achievement_status(self, achievement_name):
         # Update achievement to completed
