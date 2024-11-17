@@ -171,18 +171,14 @@ class Character:
                 self.attributes["fitness"] += 20
                 self.has_super_strength = True
             elif strange_effect == "green head":
-                if self.head_number == 2:
-                    self.gui.grow_second_green_head()
-                else:
-                    self.gui.turn_head_green()
+                self.head_colour = "green"
+                self.gui.update_body_size()
             elif strange_effect == "a second head":
-                if self.head_colour == "green":
-                    self.gui.grow_second_green_head()
-                else:
-                    self.gui.grow_second_head()
+                self.head_number = 2
+                self.gui.update_body_size()
             elif strange_effect == "glowing skin":
-                self.gui.glowing_skin()
-    
+                self.body_colour = "gold"
+                self.gui.update_body_size()
 
     def _neutral_effect(self, food: Food):
         self.attributes["hunger"] += 20

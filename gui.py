@@ -26,11 +26,6 @@ class GUI:
         self.setup_ui()
         self.update_stats()
 
-    # Function to make the character's head turn green (Radioactive)
-    def turn_head_green(self):
-        # Clear the head and redraw it with green fill
-        self.character.head_colour = "green"
-
     # Function to make the character's head turn normal (Alive/neutral/cured)
     def cure(self):
         # Clear the head and redraw it with peachpuff fill
@@ -99,53 +94,6 @@ class GUI:
         self.date_button.config(state=tk.DISABLED)
         self.time_slider.config(state=tk.DISABLED)
 
-    # Function to make the character grow a 2nd head
-    def grow_second_head(self):
-        # Clear existing heads
-        self.character_canvas.delete("head")
-
-        # Dimensions for the first head (left side)
-        first_head_left = self.head_left
-        first_head_right = self.head_right
-        first_head_top = self.head_top
-        first_head_bottom = self.head_bottom
-
-        # Dimensions for the second head (placed to the right of the first head)
-        head_width = first_head_right - first_head_left
-        second_head_left = first_head_right + 10  # Add spacing of 10 pixels
-        second_head_right = second_head_left + head_width
-        second_head_top = first_head_top
-        second_head_bottom = first_head_bottom
-
-        # Draw the first head
-        self.character_canvas.create_oval(
-            self.head_left - self.head_width/2, self.head_top,  self.head_right-self.head_width/2, self.head_bottom,
-            fill="green", tags="head"
-        )
-
-        self.head_left = self.head_left - self.head_width
-        self.head_right = self.head_right - self.head_width
-
-        self.character_canvas.create_oval(
-            self.head_left+self.head_width/2, self.head_top,  self.head_right+self.head_width/2, self.head_bottom,
-            fill="peachpuff", tags="head2"
-        )
-
-        # Update the character's head count
-        self.character.head_number = 2
-
-    # Function to make the character grow a 2nd green head
-    def grow_second_green_head(self):
-        # Clear the head and redraw 2 with green fill
-        self.head_color = "green"
-        self.grow_second_head()
-
-
-    # Function to make skin glow
-    def glowing_skin(self):
-        self.character.body_colour = "gold"
-
-    
     # Bigger arms = stronger
     def strong_arms(self):
         # Delete existing arms
@@ -161,7 +109,6 @@ class GUI:
         self.character_canvas.create_rectangle(180, 155, 270, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
 
         self.character.has_super_strength = True
-
 
     def normal_arms(self):
         # Delete existing arms
