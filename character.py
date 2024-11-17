@@ -8,6 +8,10 @@ from food import Food
 class Character:
     def __init__(self, name: str):
         self.name = name
+        self._initialise()
+
+
+    def _initialise(self):
         self.dead = False
         self.age = STARTING_AGE
         self.attributes = { # Various attributes
@@ -36,6 +40,10 @@ class Character:
 
     def set_gui(self, gui):
         self.gui = gui
+
+    def reset(self):
+        self._initialise()
+        
 
     def _check_attributes(self):
         # Ensure attributes don't go below zero or exceed reasonable limits
@@ -73,7 +81,6 @@ class Character:
             if food.name == 'apple' and random.random() < 0.1:
               # poisoned apple
               self.gui.update_log(f"uh oh! the apple was poisoned...")
-              self.gui.update_log("uh oh! the apple was poisoned...")
               self._kill_character()
             else:
               self.healthy_food_streak += 1
@@ -133,7 +140,7 @@ class Character:
         if self.head_colour == "green" or self.head_number > 1:
             if random.random() < 0.35: # chance of curing you if healthy food eaten
                 self.gui.cure()
-                print(f"{self.name} was cured!")
+                self.gui.update_log(f"{self.name} was cured!")
 
     def _unhealthy_effect(self):
         self.gui.update_log(f"{self.name} feels unfit but happier...")
@@ -192,7 +199,7 @@ class Character:
             self.attributes["height"] += MAX_HEIGHT / 5
             self.attributes["weight"] += 5
         
-        print(f"{self.name} drank the {food.name}, now they feel... old...")
+        self.gui.update_log(f"{self.name} drank the {food.name}, now they feel... old...")
 
     #-----------------------------------------------------------
     # AGING/TIME EFFECTS
@@ -248,19 +255,19 @@ class Character:
 
     def go_on_date(self):
         # Go on a date
-        print(f"{self.name} is going on a date!")
+        self.gui.update_log(f"{self.name} is going on a date!")
         self.total_dates += 1
         if random.random() < 0.05:
             # Very slim chance of meeting a serial killer
-            print(f"{self.name}'s date was a serial killer... oh dear.")
+            self.gui.update_log(f"{self.name}'s date was a serial killer... oh dear.")
             self.successful_dates_streak = 0
             self._kill_character()
         elif random.random() < 0.4:
             # Date goes badly
-            print(f"{self.name}'s date went badly...")
+            self.gui.update_log(f"{self.name}'s date went badly...")
             self.successful_dates_streak = 0
             self.attributes["happiness"] -= random.randint(15, 30)
         else:
-            print(f"{self.name} had a successful date!")
+            self.gui.update_log(f"{self.name} had a successful date!")
             self.successful_dates_streak += 1
             self.attributes["happiness"] += 20

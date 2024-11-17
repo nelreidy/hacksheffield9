@@ -14,6 +14,8 @@ class GUI:
         self.stat_labels = {}
         self.food_buttons = []
         self.all_buttons = []
+        self.restarting = False
+        self.after_id = None
 
         self.head_left = 0 
         self.head_right = 0 
@@ -94,6 +96,41 @@ class GUI:
         self.date_button.config(state=tk.DISABLED)
         self.time_slider.config(state=tk.DISABLED)
 
+    def restart(self):
+        # Restart the character and the UI
+        print(f"befror {self.character.time_speed}")
+        self.restarting = True
+
+        if self.after_id is not None:
+            self.root.after_cancel(self.after_id)
+            self.after_id = None
+
+        self.update_log("Restarting!")
+        self.character.reset()
+        self.reset_ui() 
+
+        self.restarting = False
+        print(f"aft {self.character.time_speed}")
+
+    def reset_ui(self):
+
+        if self.after_id is not None:
+            self.root.after_cancel(self.after_id)
+            self.after_id = None
+
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Clear canvas
+
+        self.stat_labels.clear()
+        self.food_buttons.clear()
+        self.all_buttons.clear()
+
+        # Reinitialize the UI
+        self.setup_ui()  # Call setup_ui to recreate the UI elements
+        self.update_stats()
+
     def setup_ui(self):
         self.root.title("Grown your own Human")
         self.root.geometry("1200x560")
@@ -105,9 +142,8 @@ class GUI:
         self.log_text = tk.Text(self.log_frame, width=70, height=5, wrap=tk.WORD, bg="white")
         self.log_text.pack(pady=5)
 
-        # Character Canvas
-        self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
-        self.character_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10)
+        self.restart_button = tk.Button(self.root, text="Restart", width=25, command= self.restart)
+        self.restart_button.grid(row=2, column=2, padx=20, pady=23, sticky="se")
 
         self.character_canvas = tk.Canvas(self.character_frame, width=300, height=400, bg="white")
         self.character_canvas.pack()
@@ -269,6 +305,9 @@ class GUI:
         self.character.attributes['happiness'] += random.randint(3, 5)
 
     def update_stats(self):
+        if (self.restarting):
+            return
+
         # Update stats on the GUI
         self.stat_labels["Age"].config(text=f"{self.character.get_age_string()}")
         self.stat_labels["Weight"].config(text=f"{self.character.attributes['weight']:.2f} kg")
@@ -292,6 +331,7 @@ class GUI:
     def update_time_speed(self, event):
         # Update time_speed based on slider value
         self.character.time_speed = self.time_slider.get()
+        print(self.time_slider.get())
 
     def update_time(self):
         # Simulate time passing
@@ -308,10 +348,15 @@ class GUI:
             self.character.time_since_effect+=1
         if random.random() < min(0.1 * self.character.time_speed, 1): # random chance of resetting available foods
             self.create_food_buttons()
+
         if not self.character.dead:
-            self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
+        # Store the after() call ID
+            self.after_id = self.root.after(REFRESH_RATE, self.update_time)
 
     def update_body_size(self):
+
+        if (self.restarting):
+            return
         # Update body on GUI based on height and weight
         if (self.character.dead):
             return
