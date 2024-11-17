@@ -383,7 +383,7 @@ class GUI:
         self.check_achievements()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
-        if random.random() < 0.1: # random chance of resetting available foods
+        if random.random() < min(0.1 * self.character.time_speed, 1): # random chance of resetting available foods
             self.create_food_buttons()
         if not self.character.dead:
             self.root.after(REFRESH_RATE, self.update_time) # Call every 1 second
