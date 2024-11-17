@@ -71,7 +71,6 @@ class Character:
             if food.name == 'apple' and random.random() < 0.1:
               # poisoned apple
               self.gui.update_log(f"uh oh! the apple was poisoned...")
-              self.gui.update_log("uh oh! the apple was poisoned...")
               self._kill_character()
             else:
               self.healthy_food_streak += 1
@@ -131,7 +130,7 @@ class Character:
         if self.head_colour == "green" or self.head_number > 1:
             if random.random() < 0.35: # chance of curing you if healthy food eaten
                 self.gui.cure()
-                print(f"{self.name} was cured!")
+                self.gui.update_log(f"{self.name} was cured!")
 
     def _unhealthy_effect(self):
         self.gui.update_log(f"{self.name} feels unfit but happier...")
@@ -190,7 +189,7 @@ class Character:
 
     def _aging_potion_effect(self, food: Food):
         self.age+=5
-        print(f"{self.name} drank the {food.name}, now they feel... old...")
+        self.gui.update_log(f"{self.name} drank the {food.name}, now they feel... old...")
 
     #-----------------------------------------------------------
     # AGING/TIME EFFECTS
@@ -246,11 +245,11 @@ class Character:
 
     def go_on_date(self):
         # Go on a date
-        print(f"{self.name} is going on a date!")
+        self.gui.update_log(f"{self.name} is going on a date!")
         if random.random() < 0.05:
             # Very slim chance of meeting a serial killer
-            print(f"{self.name}'s date was a serial killer... oh dear.")
+            self.gui.update_log(f"{self.name}'s date was a serial killer... oh dear.")
             self._kill_character()
         else:
-            print(f"{self.name} had a successful date!")
+            self.gui.update_log(f"{self.name} had a successful date!")
             self.attributes["happiness"] += 20
