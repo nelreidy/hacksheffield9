@@ -457,7 +457,6 @@ class GUI:
         if (self.character.has_super_strength)  :
             arm_length = (body_top - body_bottom)*0.5
             strength_scale = 25
-            print("super")
 
         width_scale = body_right - body_left
 

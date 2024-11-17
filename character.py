@@ -108,10 +108,12 @@ class Character:
                 self.attributes["health"] -= random.randint(1, 5)
                 self.attributes["fitness"] -= random.randint(1, 3)
                 self.attributes["happiness"] -= 5
+                self.attributes["weight"] += random.randint(1, 5)
             else:
                 self.attributes["health"] -= random.randint(10, 20)
                 self.attributes["fitness"] -= random.randint(5, 10)
                 self.attributes["happiness"] -= random.randint(10, 15)
+                self.attributes["weight"] += random.randint(5, 15)
 
     def _healthy_effect(self):
         
