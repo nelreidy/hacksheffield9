@@ -305,6 +305,7 @@ class GUI:
         self.character.attributes['fitness'] += random.randint(5, 8)
         self.character.attributes['health'] += random.randint(3, 5)
         self.character.attributes['happiness'] += random.randint(3, 5)
+        self.update_log(f"{self.character.name} is fitter and healthier, but hungrier!")
 
     def update_stats(self):
         if (self.restarting):
@@ -418,21 +419,29 @@ class GUI:
             )
 
         arm_scale = self.character.attributes["weight"] * 0.3  # Scaling factor for arms based on weight
-        arm_length = (body_top - body_bottom)*0.2
         arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width scaling
 
-        strength_scale = 15
-
-        if (self.character.has_super_strength)  :
-            arm_length = (body_top - body_bottom)*0.5
-            strength_scale = 25
+        strength_scale = self.character.attributes["weight"]*3
+            
+        arm_t_scale = 5 
 
         width_scale = body_right - body_left
 
+        if (self.character.attributes["weight"] > 10):
+            arm_t_scale = self.character.attributes["weight"]*1.5
+            strength_scale = self.character.attributes["weight"]*4
+
+        if (self.character.has_super_strength)  :
+            strength_scale = (body_top - body_bottom)*0.5
+            arm_t_scale = arm_scale*2
+
+        print(f"body_top {body_top}")
+        print(f"arms {body_top+arm_t_scale}")
+
         # Draw arms based on scaled values
         self.character_canvas.delete("arm")
-        self.character_canvas.create_rectangle(body_left - width_scale, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm")  # R
+        self.character_canvas.create_rectangle(body_left - width_scale, body_top+arm_t_scale, body_left, body_top +strength_scale , fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(body_right + width_scale, body_top+arm_t_scale, body_right, body_top +strength_scale , fill="peachpuff", tags="arm")  # R
 
     def update_achievement_status(self, achievement_name):
         # Update achievement to completed
