@@ -98,7 +98,6 @@ class GUI:
 
     def restart(self):
         # Restart the character and the UI
-        print(f"befror {self.character.time_speed}")
         self.restarting = True
 
         if self.after_id is not None:
@@ -110,7 +109,6 @@ class GUI:
         self.reset_ui() 
 
         self.restarting = False
-        print(f"aft {self.character.time_speed}")
 
     def reset_ui(self):
 
@@ -144,6 +142,10 @@ class GUI:
 
         self.restart_button = tk.Button(self.root, text="Restart", width=25, command= self.restart)
         self.restart_button.grid(row=2, column=2, padx=20, pady=23, sticky="se")
+
+        # Character Canvas
+        self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
+        self.character_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10)
 
         self.character_canvas = tk.Canvas(self.character_frame, width=300, height=400, bg="white")
         self.character_canvas.pack()
@@ -331,7 +333,6 @@ class GUI:
     def update_time_speed(self, event):
         # Update time_speed based on slider value
         self.character.time_speed = self.time_slider.get()
-        print(self.time_slider.get())
 
     def update_time(self):
         # Simulate time passing
