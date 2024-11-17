@@ -281,6 +281,7 @@ class GUI:
                         Food("Wine", "neutral"),
                         Food("Sandwich", "healthy"),
                         Food("Cucumber", "healthy"),
+                        Food("Aging Potion", "magic"),
                         ]
 
         # Create food buttons

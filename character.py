@@ -90,6 +90,8 @@ class Character:
         elif food.type == 'neutral':
             self.healthy_food_streak = 0
             self._neutral_effect(food)
+        elif food.type == 'magic':
+            self._aging_potion_effect(food)
         else:
             self.healthy_food_streak = 0
             self.gui.update_log(f"{food.name} has an unknown effect on {self.name}.")
@@ -126,9 +128,10 @@ class Character:
         self.attributes["hair_length"] += 2
         self.attributes["happiness"] += 5
         
-        #self.gui.cure()
-        if random.random() < 0.35: # low chance of curing you if apple eaten
-            self.gui.cure()
+        if self.head_colour == "green" or self.head_number > 1:
+            if random.random() < 0.35: # chance of curing you if healthy food eaten
+                self.gui.cure()
+                print(f"{self.name} was cured!")
 
     def _unhealthy_effect(self):
         self.gui.update_log(f"{self.name} feels unfit but happier...")
@@ -184,6 +187,10 @@ class Character:
         self.gui.update_log(f"{self.name} ate the {food.name}, but not much happened.")
 
         self.attributes["hunger"] += random.randint(1, 5)
+
+    def _aging_potion_effect(self, food: Food):
+        self.age+=5
+        print(f"{self.name} drank the {food.name}, now they feel... old...")
 
     #-----------------------------------------------------------
     # AGING/TIME EFFECTS
