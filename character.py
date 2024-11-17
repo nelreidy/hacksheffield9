@@ -190,6 +190,10 @@ class Character:
 
     def _aging_potion_effect(self, food: Food):
         self.age+=5
+        if self.attributes["height"] < MAX_HEIGHT:
+            self.attributes["height"] += MAX_HEIGHT / 5
+            self.attributes["weight"] += 5
+        
         print(f"{self.name} drank the {food.name}, now they feel... old...")
 
     #-----------------------------------------------------------
