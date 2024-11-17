@@ -21,7 +21,8 @@ class Character:
         }
         self.effects = []  # Stores special effects like "second head"
         self.time_speed = 1 # How fast time passes
-        self.head_colour = ""
+        self.head_colour = "peachpuff"
+        self.body_colour = "lightblue"
         self.head_number = 1
         self.has_super_strength = False
         self.time_since_effect = 0
@@ -52,7 +53,6 @@ class Character:
             self.time_speed = MIN_TIME_SPEED
 
         if self.time_since_effect > 3:
-            self.gui.normal_arms()
             self.has_super_strength = False
             self.time_since_effect = 0
 
@@ -89,20 +89,29 @@ class Character:
         elif food.type == 'neutral':
             self.healthy_food_streak = 0
             self._neutral_effect(food)
+        elif food.type == 'magic':
+            self._aging_potion_effect(food)
         else:
             self.healthy_food_streak = 0
             print(f"{food.name} has an unknown effect on {self.name}.")
         
         self._check_hungry()
         self._check_attributes()
+        self.gui.update_body_size()
 
     def _check_hungry(self):
-        if self.attributes["hunger"] >= MAX_HUNGER:
+        # Check if character has overeaten
+        if self.attributes["hunger"] > MAX_HUNGER:
             print(f"{self.name} isn't hungry, the extra food made them feel ill!")
-            # TODO make this depend on how much extra they ate?
-            self.attributes["health"] -= 20
-            self.attributes["fitness"] -= 5
-            self.attributes["happiness"] -= 5
+            over_hunger = self.attributes["hunger"] - MAX_HUNGER
+            if over_hunger <= 10:
+                self.attributes["health"] -= random.randint(1, 5)
+                self.attributes["fitness"] -= random.randint(1, 3)
+                self.attributes["happiness"] -= 5
+            else:
+                self.attributes["health"] -= random.randint(10, 20)
+                self.attributes["fitness"] -= random.randint(5, 10)
+                self.attributes["happiness"] -= random.randint(10, 15)
 
     def _healthy_effect(self):
         print(f"{self.name} feels healthier, fitter, and grows a little!")
@@ -121,14 +130,13 @@ class Character:
 
     def _unhealthy_effect(self):
         print(f"{self.name} feels unfit but happier...")
+        self.has_super_strength = True
 
         self.attributes["hunger"] += 10
         self.attributes["health"] -= 10
         self.attributes["fitness"] -= 5
         self.attributes["happiness"] += 10
         
-       # self.gui.fat()
-
     def _deadly_effect(self):
         print(f"{self.name} has eaten something deadly... uh oh!")
         self._kill_character()
@@ -155,7 +163,7 @@ class Character:
 
             if strange_effect == "super strength":
                 self.attributes["fitness"] += 20
-                self.gui.strong_arms()
+                self.has_super_strength = True
             elif strange_effect == "green head":
                 if self.head_number == 2:
                     self.gui.grow_second_green_head()
@@ -173,6 +181,12 @@ class Character:
     def _neutral_effect(self, food: Food):
         self.attributes["hunger"] += 20
         print(f"{self.name} ate the {food.name}, but not much happened.")
+
+        self.attributes["hunger"] += random.randint(1, 5)
+
+    def _aging_potion_effect(self, food: Food):
+        self.age+=5
+        print(f"{self.name} drank the {food.name}, now they feel... old...")
 
     #-----------------------------------------------------------
     # AGING/TIME EFFECTS
@@ -197,6 +211,7 @@ class Character:
         days = self.time_speed
         self.age += days / 365
         self.attributes["hunger"] -= days * 0.5
+        self.attributes["hair_length"] += days * 0.5
 
         # Update achievements
         self.avoided_radioactive_time += self.time_speed
