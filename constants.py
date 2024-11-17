@@ -1,6 +1,7 @@
 # Constants
 
 STARTING_AGE = 0
+DATING_AGE = 5
 
 # Health level
 BASE_HEALTH = 75

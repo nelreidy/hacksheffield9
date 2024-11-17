@@ -47,7 +47,7 @@ class Character:
 
         if self.attributes["health"] == 0 and not self.dead:
             self._kill_character()
-            print(f"{self.name} has died due to poor health!")
+            self.gui.update_log(f"{self.name} has died due to poor health!")
         
         if self.time_speed < MIN_TIME_SPEED:
             self.time_speed = MIN_TIME_SPEED
@@ -62,15 +62,16 @@ class Character:
     def eat(self, food: Food):
         # Apply effects to character attributes based on food being consumed
         if self.dead:
-            print(f"{self.name} is dead!")
+            self.gui.update_log(f"{self.name} is dead!")
             return
 
-        print(f"{self.name} is eating {food.name}")
+        self.gui.update_log(f"{self.name} is eating {food.name}")
 
         if food.type == 'healthy':
             if food.name == 'apple' and random.random() < 0.1:
               # poisoned apple
-              print(f"uh oh! the apple was poisoned...")
+              self.gui.update_log(f"uh oh! the apple was poisoned...")
+              self.gui.update_log("uh oh! the apple was poisoned...")
               self._kill_character()
             else:
               self.healthy_food_streak += 1
@@ -93,7 +94,7 @@ class Character:
             self._aging_potion_effect(food)
         else:
             self.healthy_food_streak = 0
-            print(f"{food.name} has an unknown effect on {self.name}.")
+            self.gui.update_log(f"{food.name} has an unknown effect on {self.name}.")
         
         self._check_hungry()
         self._check_attributes()
@@ -102,7 +103,8 @@ class Character:
     def _check_hungry(self):
         # Check if character has overeaten
         if self.attributes["hunger"] > MAX_HUNGER:
-            print(f"{self.name} isn't hungry, the extra food made them feel ill!")
+            
+            self.gui.update_log( f"{self.name} isn't hungry, the extra food made them feel ill!")
             over_hunger = self.attributes["hunger"] - MAX_HUNGER
             if over_hunger <= 10:
                 self.attributes["health"] -= random.randint(1, 5)
@@ -114,7 +116,8 @@ class Character:
                 self.attributes["happiness"] -= random.randint(10, 15)
 
     def _healthy_effect(self):
-        print(f"{self.name} feels healthier, fitter, and grows a little!")
+        
+        self.gui.update_log(f"{self.name} feels healthier, fitter, and grows a little!")
 
         self.attributes["hunger"] += 5
         self.attributes["health"] += 10
@@ -129,8 +132,7 @@ class Character:
                 print(f"{self.name} was cured!")
 
     def _unhealthy_effect(self):
-        print(f"{self.name} feels unfit but happier...")
-        self.has_super_strength = True
+        self.gui.update_log(f"{self.name} feels unfit but happier...")
 
         self.attributes["hunger"] += 10
         self.attributes["health"] -= 10
@@ -138,17 +140,17 @@ class Character:
         self.attributes["happiness"] += 10
         
     def _deadly_effect(self):
-        print(f"{self.name} has eaten something deadly... uh oh!")
+        self.gui.update_log(f"{self.name} has eaten something deadly... uh oh!")
         self._kill_character()
 
     def _radioactive_effect(self):
-        print(f"{self.name} has eaten radioactivate food and now something strange is occurring...")
+        self.gui.update_log(f"{self.name} has eaten radioactivate food and now something strange is occurring...")
 
         # Apply a random radioactive effect
         random_effects = [
             ("height", random.randint(-5, 15)),
-            ("health", random.randint(-20, 20)),
-            ("happiness", random.randint(-10, 10)),
+            ("health", random.randint(-40, 20)),
+            ("happiness", random.randint(-30, 10)),
             ("hunger", random.randint(-20, 20))
         ]
         for attr, effect in random_effects:
@@ -159,7 +161,7 @@ class Character:
             strange_effect = random.choice(RADIOACTIVE_EFFECTS)
             self.effects.append(strange_effect)
 
-            print(f"{self.name} has gained {strange_effect}")
+            self.gui.update_log(f"{self.name} has gained {strange_effect}")
 
             if strange_effect == "super strength":
                 self.attributes["fitness"] += 20
@@ -180,7 +182,7 @@ class Character:
 
     def _neutral_effect(self, food: Food):
         self.attributes["hunger"] += 20
-        print(f"{self.name} ate the {food.name}, but not much happened.")
+        self.gui.update_log(f"{self.name} ate the {food.name}, but not much happened.")
 
         self.attributes["hunger"] += random.randint(1, 5)
 
@@ -201,15 +203,15 @@ class Character:
         # Apply effects based on age of character
         if self.age >= 150:
             self._kill_character()
-            print(f"{self.name} has died of old age :(")
+            self.gui.update_log(f"{self.name} has died of old age :(")
         elif self.age >= 80:
             self.attributes["health"] -= 5
-            print(f"{self.name} is feeling the effects of old age...")
+            self.gui.update_log(f"{self.name} is feeling the effects of old age...")
 
     def pass_time(self):
-        # Pass 1 day, adjusted by time speed
+        # Pass 1 week, adjust fields on time speed
         days = self.time_speed
-        self.age += days / 365
+        self.age += (days / 365) * 7
         self.attributes["hunger"] -= days * 0.5
         self.attributes["hair_length"] += days * 0.5
 
@@ -218,11 +220,11 @@ class Character:
         self.avoided_unhealthy_time += self.time_speed
 
         if self.attributes["hunger"] <= 0.0:
-            print(f"{self.name} starved to death!")
+            self.gui.update_log(f"{self.name} starved to death!")
             self._kill_character()
         elif self.attributes["hunger"] <= STARVING_LEVEL:
             self.attributes["health"] -= 5
-            print(f"{self.name} is starving!")
+            self.gui.update_log(f"{self.name} is starving!")
         
         if self.attributes["height"] < MAX_HEIGHT:
             self.attributes["height"] += 0.25
@@ -236,4 +238,17 @@ class Character:
         years = int(self.age)
         months = round((self.age - years) * 12)
         return f"{years} years, {months} months"
-    
+  
+    #-----------------------------------------------------------
+    # OTHER METHODS
+
+    def go_on_date(self):
+        # Go on a date
+        print(f"{self.name} is going on a date!")
+        if random.random() < 0.05:
+            # Very slim chance of meeting a serial killer
+            print(f"{self.name}'s date was a serial killer... oh dear.")
+            self._kill_character()
+        else:
+            print(f"{self.name} had a successful date!")
+            self.attributes["happiness"] += 20

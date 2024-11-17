@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import random
 from character import Character
-from constants import REFRESH_RATE, MIN_TIME_SPEED, MAX_TIME_SPEED
+from constants import REFRESH_RATE, MIN_TIME_SPEED, MAX_TIME_SPEED, DATING_AGE
 from food import Food
 
 class GUI:
@@ -57,7 +57,7 @@ class GUI:
         self.character_canvas.create_oval(head_left, head_top, head_right, head_bottom, fill="peachpuff", tags="head")
 
         # Reset head color and number to default (single head)
-        print("cure")
+        
         self.character.head_colour = "peachpuff"
         self.character.body_colour = "lightblue"
 
@@ -174,12 +174,19 @@ class GUI:
 
 
     def setup_ui(self):
-        self.root.title("Simulation UI")
+        self.root.title("Grown your own Human")
         self.root.geometry("900x560")
 
         # Character Canvas
         self.character_frame = tk.Frame(self.root, width=300, height=400, bg="white")
         self.character_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10)
+
+        self.log_frame = tk.Frame(self.root, width=600, height=100, bg="white" )
+        self.log_frame.grid(row=1, column=1, columnspan=2, padx=10, pady=10 )
+
+        self.log_text = tk.Text(self.log_frame, width=70, height=5, wrap=tk.WORD, bg="white")
+        self.log_text.pack(pady=5)
+
 
         self.character_canvas = tk.Canvas(self.character_frame, width=300, height=400, bg="white")
         self.character_canvas.pack()
@@ -289,8 +296,19 @@ class GUI:
         exercise_button.grid(row=3, column=1, padx=5, pady=10)  
         self.all_buttons.append(exercise_button)
 
+        self.date_button = tk.Button(self.interaction_frame, text="Date", width=25, command=self.go_on_date, state=tk.DISABLED)
+        self.date_button.grid(row=3, column=2, padx=5, pady=10)  
+        self.all_buttons.append(self.date_button)
+
         # Start time loop
         self.update_time()
+
+    def update_log(self, new_text):
+        self.log_text.config(state=tk.NORMAL)  # Enable editing
+        self.log_text.delete(1.0, tk.END)  # Clear the existing text
+        self.log_text.insert(tk.END, new_text)  # Insert the new text
+        self.log_text.config(state=tk.DISABLED)  # Disable editing again
+
 
     def create_food_buttons(self):
         # Clear existing buttons
@@ -305,7 +323,7 @@ class GUI:
             row = 1
             col = i
             button = tk.Button(self.interaction_frame, text=food.name, width=25, command=lambda f=food: self.feed_character(f))
-            button.grid(row=1, column=i, padx=5, pady=5)
+            button.grid(row=2, column=i, padx=5, pady=5, sticky="n")
             self.food_buttons.append(button)
             self.all_buttons.append(button)
 
@@ -339,6 +357,16 @@ class GUI:
         self.stat_labels["Hunger"].config(text=f"{self.character.attributes['hunger']:.2f}")
         self.stat_labels["Hair Length"].config(text=f"{self.character.attributes['hair_length']:.2f} cm")
 
+    def check_dating_age(self):
+        # Check if character is old enough to date
+        if self.character.age >= DATING_AGE:
+            self.date_button.config(state=tk.NORMAL)
+        
+    def go_on_date(self):
+        # Go on a date
+        self.character.go_on_date()
+        self.update_stats()
+
     def update_time_speed(self, event):
         # Update time_speed based on slider value
         self.character.time_speed = self.time_slider.get()
@@ -346,11 +374,13 @@ class GUI:
     def update_time(self):
         # Simulate time passing
         # Method is called repeatedly
+        if self.character.dead:
+            return
+
+        self.check_dating_age()
         self.character.pass_time()
         self.update_stats()
-        if (not self.character.dead):
-            self.update_body_size()
-
+        self.update_body_size()
         self.check_achievements()
         if self.character.has_super_strength:
             self.character.time_since_effect+=1
@@ -423,7 +453,7 @@ class GUI:
         arm_length = (body_top - body_bottom)*0.2
         arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width scaling
 
-        strength_scale = 10
+        strength_scale = 15
 
         if (self.character.has_super_strength)  :
             arm_length = (body_top - body_bottom)*0.5
