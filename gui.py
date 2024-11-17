@@ -388,7 +388,7 @@ class GUI:
                 head_left, head_top, head_right+add, head_bottom, fill=self.character.head_colour, tags="head"
             )
         elif self.character.head_number == 2:
-            head_bottom += 20
+            head_bottom += 10
             # Draw two heads
             spacing = 5  # Space between the two heads
             first_head_left = head_left - (head_width / 2)
@@ -420,8 +420,8 @@ class GUI:
 
         # Draw arms based on scaled values
         self.character_canvas.delete("arm")
-        self.character_canvas.create_rectangle(body_left - width_scale, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm")  # R
+        self.character_canvas.create_rectangle(body_left - width_scale*arm_width, body_top +strength_scale, body_left, body_top +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(body_right + width_scale, body_top +strength_scale, body_right, body_top +strength_scale + arm_length, fill="peachpuff", tags="arm")  # R
 
     def update_achievement_status(self, achievement_name):
         # Update achievement to completed
