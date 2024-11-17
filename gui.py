@@ -29,7 +29,37 @@ class GUI:
     # Function to make the character's head turn green (Radioactive)
     def turn_head_green(self):
         # Clear the head and redraw it with green fill
+        self.character_canvas.delete("head")
+
+        # Use the head width and height attributes to determine the size of the head
+        head_width = self.head_right - self.head_left
+        head_height = self.head_bottom - self.head_top
+
+        # Calculate the center of the body and position the head accordingly
+        body_left = 120  # Assuming body_left is the starting point of the body
+        body_right = body_left + (self.character.attributes["weight"] * 4)
+        body_top = 150
+        body_bottom = body_top + (self.character.attributes["height"] * 2)
+
+        # Calculate the center for the head
+        head_center_x = (body_left + body_right) / 2
+        head_top = body_top - head_height
+        head_left = head_center_x - (head_width / 2)
+        head_right = head_center_x + (head_width / 1) 
+        head_bottom = head_top + head_height
+
+        # Redraw the head centered at the correct position
+        self.character_canvas.create_oval(head_left, head_top, head_right, head_bottom, fill="green", tags="head")
+
+        # Reset head color and number to default (single head)
+        
         self.character.head_colour = "green"
+
+        # Update the head position attributes for future use
+        self.head_left = head_left
+        self.head_right = head_right
+        self.head_top = head_top
+        self.head_bottom = head_bottom
 
     # Function to make the character's head turn normal (Alive/neutral/cured)
     def cure(self):
@@ -112,7 +142,7 @@ class GUI:
 
         # Dimensions for the second head (placed to the right of the first head)
         head_width = first_head_right - first_head_left
-        second_head_left = first_head_right + 10  # Add spacing of 10 pixels
+        second_head_left = first_head_right + 5  # Add spacing of 5 pixels
         second_head_right = second_head_left + head_width
         second_head_top = first_head_top
         second_head_bottom = first_head_bottom
@@ -125,10 +155,10 @@ class GUI:
 
         self.head_left = self.head_left - self.head_width
         self.head_right = self.head_right - self.head_width
-
+        # Draw the second head
         self.character_canvas.create_oval(
             self.head_left+self.head_width/2, self.head_top,  self.head_right+self.head_width/2, self.head_bottom,
-            fill="peachpuff", tags="head2"
+            fill="peachpuff", tags="head"
         )
 
         # Update the character's head count
@@ -137,7 +167,7 @@ class GUI:
     # Function to make the character grow a 2nd green head
     def grow_second_green_head(self):
         # Clear the head and redraw 2 with green fill
-        self.head_color = "green"
+        self.character.head_color = "green"
         self.grow_second_head()
 
 
@@ -157,8 +187,8 @@ class GUI:
         arm_width = 20 + (self.character.attributes["height"] * 0.05)  # Arm width also scales with height
 
         # Adjust arm positions based on the scaling
-        self.character_canvas.create_rectangle(30, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 270, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
+        self.character_canvas.create_rectangle(30-arm_width, 105, 120, 135 + arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 135, 270+arm_width, 105 + arm_length, fill="peachpuff", tags="arm")  # Right arm
 
         self.character.has_super_strength = True
 
@@ -173,8 +203,8 @@ class GUI:
         arm_width = 15 + (self.character.attributes["height"] * 0.03)  # Arm width based on height
 
         # Adjust arm positions based on the scaling
-        self.character_canvas.create_rectangle(60, 155, 120, 155 + arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(180, 155, 240, 155 + arm_length, fill="peachpuff", tags="arm")  # Right arm
+        self.character_canvas.create_rectangle(60-arm_width, 115, 120, 115 + arm_length, fill="peachpuff", tags="arm")  # Left arm
+        self.character_canvas.create_rectangle(180, 115, 240+arm_width, 115 + arm_length, fill="peachpuff", tags="arm")  # Right arm
 
 
     def setup_ui(self):
@@ -432,10 +462,10 @@ class GUI:
         elif self.character.head_number == 2:
             head_bottom += 20
             # Draw two heads
-            spacing = 0.5  # Space between the two heads
+            spacing = 5  # Space between the two heads
             first_head_left = head_left - (head_width / 2)
             first_head_right = first_head_left + head_width
-            second_head_left = head_right 
+            second_head_left = head_right + spacing
             second_head_right = second_head_left + head_width
 
             # Draw first head
@@ -462,9 +492,8 @@ class GUI:
 
         # Draw arms based on scaled values
         self.character_canvas.delete("arm")
-        self.character_canvas.delete("arm2")
         self.character_canvas.create_rectangle(body_left - width_scale, head_bottom +strength_scale, body_left, head_bottom +strength_scale+ arm_length, fill="peachpuff", tags="arm")  # Left arm
-        self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm2")  # R
+        self.character_canvas.create_rectangle(body_right + width_scale, head_bottom +strength_scale, body_right, head_bottom +strength_scale + arm_length, fill="peachpuff", tags="arm")  # R
 
     def update_achievement_status(self, achievement_name):
         # Update achievement to completed

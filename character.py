@@ -184,7 +184,7 @@ class Character:
 
     def _neutral_effect(self, food: Food):
         self.attributes["hunger"] += 20
-        self.gui.update_log(f"{self.name} ate the {food.name}, but not much happened.")
+        self.gui.update_log(f"{self.name} consumed the {food.name}, but not much happened.")
 
         self.attributes["hunger"] += random.randint(1, 5)
 
